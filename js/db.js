@@ -33,6 +33,19 @@ export async function sair() {
   await db.auth.signOut();
   Object.keys(localStorage).filter(k => k.startsWith('hub_')).forEach(k => localStorage.removeItem(k));
 }
+export async function pedirTrocaDeSenha(email) {
+  const volta = location.origin + location.pathname;
+  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: volta });
+  if (error) throw new Error(ehErroDeRede(error) ? 'Sem internet' : 'Não foi possível enviar o e-mail. Confira o endereço.');
+}
+export async function trocarSenha(senha) {
+  const { error } = await db.auth.updateUser({ password: senha });
+  if (error) throw new Error('Não foi possível trocar a senha. Use pelo menos 6 caracteres.');
+}
+// Avisa quando a pessoa chega pelo link de troca de senha do e-mail.
+export function aoPedirNovaSenha(fn) {
+  db.auth.onAuthStateChange(evento => { if (evento === 'PASSWORD_RECOVERY') fn(); });
+}
 export async function usuarioAtual() {
   const { data } = await db.auth.getSession();   // funciona sem internet (sessão guardada no aparelho)
   return data.session?.user || null;

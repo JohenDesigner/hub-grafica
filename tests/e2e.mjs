@@ -42,6 +42,10 @@ try {
   await pg.goto(BASE);
   await pg.waitForSelector('#login:not([hidden])');
   await print('01-login');
+  await pg.click('#esqueci'); await esperar(200);
+  ok((await texto('#login-erro')).includes('Digite seu e-mail'), 'esqueci a senha pede o e-mail');
+  await pg.fill('[name=email]', 'teste@johen.com'); await pg.click('#esqueci'); await esperar(300);
+  ok(await pg.evaluate(() => window.__resetPara === 'teste@johen.com'), 'esqueci a senha envia o link');
   await pg.fill('[name=email]', 'teste@johen.com'); await pg.fill('[name=senha]', 'errada');
   await pg.click('#form-login button'); await esperar(300);
   ok((await texto('#login-erro')) === 'E-mail ou senha incorretos', 'senha errada mostra aviso');

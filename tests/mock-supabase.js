@@ -108,7 +108,10 @@
             banco.sessao = { user: USUARIO }; gravar(); return { data: { session: banco.sessao }, error: null };
           },
           async getSession() { banco = carregar() || banco; return { data: { session: banco.sessao }, error: null }; },
-          async signOut() { banco.sessao = null; gravar(); return { error: null }; }
+          async signOut() { banco.sessao = null; gravar(); return { error: null }; },
+          async resetPasswordForEmail(email) { window.__resetPara = email; return { data: {}, error: null }; },
+          async updateUser() { return { data: {}, error: null }; },
+          onAuthStateChange() { return { data: { subscription: { unsubscribe() {} } } }; }
         }
       };
     }
