@@ -123,3 +123,6 @@ create index on produtos (user_id);
 revoke all on clientes, produtos, fichas, pagamentos, configuracoes from anon;
 revoke execute on function limpa_lixeira() from anon, public;
 grant execute on function limpa_lixeira() to authenticated;
+
+-- função criada pelo Supabase ao ligar "automatic RLS": não deve ser chamada de fora
+revoke execute on function public.rls_auto_enable() from anon, authenticated, public;

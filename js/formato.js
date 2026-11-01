@@ -12,6 +12,10 @@ export function data(iso) {
   const [a, m, d] = String(iso).slice(0, 10).split('-');
   return `${d}/${m}/${a}`;
 }
+// Data de hoje no fuso do aparelho, como "2026-11-01".
+export function hojeISO(agora = new Date()) {
+  return new Date(agora.getTime() - agora.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+}
 export function soDigitos(texto) { return String(texto ?? '').replace(/\D/g, ''); }
 export function telefoneWa(texto) {
   const d = soDigitos(texto);

@@ -1,10 +1,19 @@
 import { moeda, data, telefoneWa } from './formato.js';
 import { calcularItem } from './calc.js';
 
+// "100 un.", "100×60 cm", "Gravação 1 lado + Caixinha personalizada" — usado na tela, no WhatsApp e no PDF.
+export function detalheItem(it) {
+  const partes = [];
+  if (it.tipo === 'm2' || it.livre) partes.push(`${it.largura_cm}×${it.altura_cm} cm`);
+  else if (it.tipo === 'opcoes' && it.opcao?.label && !/^cada/i.test(it.opcao.label)) partes.push(it.opcao.label.replace(/\s*\(\+R\$\s*\d+\)/, ''));
+  for (const a of it.acabamentos || []) partes.push(a.nome);
+  if (it.descricao) partes.push(it.descricao);
+  return partes.join(' · ');
+}
+
 const linhaItem = it => {
-  const medida = it.tipo === 'm2' ? ` ${it.largura_cm}×${it.altura_cm} cm` : '';
-  const acab = (it.acabamentos || []).map(a => a.nome).join(', ');
-  return `• ${it.quantidade}× ${it.nome}${medida}${acab ? ' (' + acab + ')' : ''}: ${moeda(calcularItem(it).centavos)}`;
+  const det = detalheItem(it);
+  return `• ${it.quantidade}× ${it.nome}${det ? ' — ' + det : ''}: ${moeda(calcularItem(it).centavos)}`;
 };
 const trocar = (t, v) => t.replace(/\{(\w+)\}/g, (_, k) => v[k] ?? '');
 
