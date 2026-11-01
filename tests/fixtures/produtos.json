@@ -1,0 +1,1859 @@
+{
+"cartoes": [
+{
+"id": "p1",
+"sub": "couche_brilho",
+"subNome": "Couché Brilho",
+"nome": "Couché 250g — Couché Brilho (Frente)",
+"material": "Couché 250g",
+"acab": "Couché Brilho",
+"impressao": "Frente",
+"prazo": "3 a 5 dias úteis",
+"obs": "Impresso em papel couché 250g com verniz de fábrica brilhante, aplicado somente na frente da peça. Corte reto, sem acabamento especial.",
+"curiosidade": "O papel couché ganhou esse nome do processo de \"couchage\", um revestimento com camada mineral que dá aquele brilho espelhado — criado na Europa no século 19 para imprimir revistas de luxo.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "100 un.",
+"preco": 76.5
+},
+{
+"label": "500 un.",
+"preco": 85.0
+},
+{
+"label": "1000 un.",
+"preco": 115.0
+}
+],
+"img": "img/produtos/cartoes-p1.webp"
+},
+{
+"id": "p2",
+"sub": "couche_brilho",
+"subNome": "Couché Brilho",
+"nome": "Couché 250g — Couché Brilho (Frente e Verso)",
+"material": "Couché 250g",
+"acab": "Couché Brilho",
+"impressao": "Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Mesma base do couché 250g com brilho de fábrica, mas com impressão nos dois lados — ideal para aproveitar o verso com QR code, redes sociais ou mapa de localização.",
+"curiosidade": "Cartões com verso impresso tendem a ser guardados por mais tempo: ter uma informação extra no verso aumenta a chance de o cliente lembrar da marca depois.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "100 un.",
+"preco": 103.5
+},
+{
+"label": "500 un.",
+"preco": 115.0
+},
+{
+"label": "1000 un.",
+"preco": 135.0
+}
+],
+"img": "img/produtos/cartoes-p2.webp"
+},
+{
+"id": "p3",
+"sub": "couche_brilho",
+"subNome": "Couché Brilho",
+"nome": "Couché 300g — Couché Brilho",
+"material": "Couché 300g",
+"acab": "Couché Brilho",
+"impressao": "Frente / Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Papel couché 300g, mais espesso e rígido que o de 250g, com o mesmo brilho de fábrica. Passa uma sensação de mais qualidade ao toque.",
+"curiosidade": "300g é praticamente a mesma gramatura usada em capas de revista — por isso esse cartão fica firme e não dobra fácil dentro da carteira.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "100 un.",
+"preco": 99.9
+},
+{
+"label": "500 un.",
+"preco": 159.9
+},
+{
+"label": "1000 un.",
+"preco": 174.9
+}
+],
+"img": "img/produtos/cartoes-p3.webp"
+},
+{
+"id": "p4",
+"sub": "fosco_verniz",
+"subNome": "Fosco + Verniz",
+"nome": "Couché 300g — Fosco + Verniz Localizado",
+"material": "Couché 300g",
+"acab": "Fosco + Verniz Localizado",
+"impressao": "Frente / Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Base em couché 300g com laminação fosca em toda a peça e verniz UV localizado aplicado só em partes específicas do design (normalmente logo ou texto), criando contraste de textura.",
+"curiosidade": "O verniz localizado é aplicado numa segunda passada, quase como uma \"impressão extra\" — por isso cria aquele relevo brilhante que dá pra sentir ao passar o dedo, mesmo sendo bem fino.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "100 un.",
+"preco": 179.9
+},
+{
+"label": "500 un.",
+"preco": 204.9
+},
+{
+"label": "1000 un.",
+"preco": 224.9
+}
+],
+"img": "img/produtos/cartoes-p4.webp"
+},
+{
+"id": "p5",
+"sub": "fosco_arred",
+"subNome": "Fosco + Canto Arredondado",
+"nome": "Couché 300g — Fosco + Canto Arredondado",
+"material": "Couché 300g",
+"acab": "Fosco + Canto Arredondado",
+"impressao": "Frente / Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Couché 300g laminado fosco (efeito aveludado, sem reflexo) com os quatro cantos arredondados no corte final.",
+"curiosidade": "Cantos arredondados ficaram populares porque desgastam menos rápido na carteira — a ponta reta costuma ser o primeiro lugar onde o cartão amassa ou lasca.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "100 un.",
+"preco": 190.3
+},
+{
+"label": "500 un.",
+"preco": 224.9
+},
+{
+"label": "1000 un.",
+"preco": 260.0
+}
+],
+"img": "img/produtos/cartoes-p5.webp"
+},
+{
+"id": "p7",
+"sub": "hot_stamping",
+"subNome": "Hot Stamping",
+"nome": "Couché 300g — Hot Stamping + Canto Arredondado",
+"material": "Couché 300g",
+"acab": "Hot Stamping + Canto Arredondado",
+"impressao": "Frente / Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Couché 300g com hot stamping (folha metálica aplicada a quente e sob pressão, geralmente dourada ou prateada) no logo ou em detalhes do design, combinado com corte de cantos arredondados.",
+"curiosidade": "O hot stamping usa temperaturas de até 120°C para fixar a folha metálica sobre o papel — é a mesma técnica usada em capas de livro premium e convites de casamento.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "100 un.",
+"preco": 200.0
+},
+{
+"label": "500 un.",
+"preco": 350.0
+},
+{
+"label": "1000 un.",
+"preco": 600.0
+}
+],
+"img": "img/produtos/cartoes-p7.webp"
+},
+{
+"id": "p6",
+"sub": "hot_stamping",
+"subNome": "Hot Stamping",
+"nome": "Couché 300g — Fosco + Hot Stamping",
+"material": "Couché 300g",
+"acab": "Fosco + Hot Stamping",
+"impressao": "Frente / Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Base fosca (laminação aveludada) em couché 300g com aplicação de hot stamping metálico em pontos do design, sem corte arredondado.",
+"curiosidade": "A combinação fosco + metálico é bastante pedida por advogados e imobiliárias por passar uma sensação \"premium\" sem exagerar — o brilho aparece só no detalhe.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "100 un.",
+"preco": 200.0
+},
+{
+"label": "500 un.",
+"preco": 350.0
+},
+{
+"label": "1000 un.",
+"preco": 600.0
+}
+],
+"img": "img/produtos/cartoes-p6.webp"
+}
+],
+"panfletos": [
+{
+"id": "p1",
+"sub": "tam_10x14",
+"subNome": "10x14cm",
+"nome": "10x14cm — 90g Brilho Econômico (Frente)",
+"material": "90g Brilho (Econômico)",
+"acab": "10x14cm",
+"impressao": "Frente",
+"prazo": "3 a 5 dias úteis",
+"obs": "Impresso em papel couché brilho 90g, ideal para panfletos econômicos de grande tiragem, como distribuição em rua ou mala direta.",
+"curiosidade": "O formato 10x14cm é um dos mais usados no Brasil por caber fácil na mão e ainda ter espaço pra uma boa chamada.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "1.000 un.",
+"preco": 180.0
+},
+{
+"label": "2.500 un.",
+"preco": 245.0
+},
+{
+"label": "5.000 un.",
+"preco": 380.0
+}
+],
+"img": "img/produtos/panfletos-p1.webp"
+},
+{
+"id": "p2",
+"sub": "tam_10x14",
+"subNome": "10x14cm",
+"nome": "10x14cm — 90g Brilho Econômico (Frente e Verso)",
+"material": "90g Brilho (Econômico)",
+"acab": "10x14cm",
+"impressao": "Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Mesma base em couché brilho 90g, com impressão nos dois lados — ótimo pra aproveitar o verso com mais informações ou um cupom.",
+"curiosidade": "Imprimir frente e verso costuma sair mais em conta do que fazer dois panfletos separados com a mesma tiragem.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "1.000 un.",
+"preco": 220.0
+},
+{
+"label": "2.500 un.",
+"preco": 300.0
+},
+{
+"label": "5.000 un.",
+"preco": 430.0
+}
+],
+"img": "img/produtos/panfletos-p2.webp"
+},
+{
+"id": "p3",
+"sub": "tam_10x14",
+"subNome": "10x14cm",
+"nome": "10x14cm — 115g Brilho Padrão (Frente)",
+"material": "115g Brilho (Padrão)",
+"acab": "10x14cm",
+"impressao": "Frente",
+"prazo": "3 a 5 dias úteis",
+"obs": "Papel couché brilho 115g, mais resistente que o 90g — bom pra quem quer um panfleto com mais corpo na mão.",
+"curiosidade": "O papel mais espesso ajuda o panfleto a não amassar tão fácil dentro da bolsa ou mochila de quem recebe.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "1.000 un.",
+"preco": 280.0
+},
+{
+"label": "2.000 un.",
+"preco": 340.0
+},
+{
+"label": "5.000 un.",
+"preco": 380.0
+}
+],
+"img": "img/produtos/panfletos-p3.webp"
+},
+{
+"id": "p4",
+"sub": "tam_10x14",
+"subNome": "10x14cm",
+"nome": "10x14cm — 115g Brilho Padrão (Frente e Verso)",
+"material": "115g Brilho (Padrão)",
+"acab": "10x14cm",
+"impressao": "Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Papel couché brilho 115g impresso nos dois lados, unindo durabilidade com mais espaço de conteúdo.",
+"curiosidade": "Muito usado por quem quer colocar um mapa ou cupom no verso sem abrir mão da qualidade na frente.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "1.000 un.",
+"preco": 380.0
+},
+{
+"label": "2.500 un.",
+"preco": 400.0
+},
+{
+"label": "5.000 un.",
+"preco": 500.0
+}
+],
+"img": "img/produtos/panfletos-p4.webp"
+},
+{
+"id": "p5",
+"sub": "tam_15x21",
+"subNome": "15x21cm",
+"nome": "15x21cm — 90g Brilho Meia A4 (Frente)",
+"material": "90g Brilho (Meia A4)",
+"acab": "15x21cm",
+"impressao": "Frente",
+"prazo": "3 a 5 dias úteis",
+"obs": "Formato meia A4 em papel couché brilho 90g — mais área de impressão pra destacar produtos, cardápios ou promoções.",
+"curiosidade": "O 15x21cm é o dobro do tamanho do 10x14cm, ótimo pra quem precisa de mais espaço sem ir direto pro A4 inteiro.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "1.000 un.",
+"preco": 320.0
+},
+{
+"label": "2.500 un.",
+"preco": 450.0
+},
+{
+"label": "5.000 un.",
+"preco": 700.0
+}
+],
+"img": "img/produtos/panfletos-p5.webp"
+},
+{
+"id": "p6",
+"sub": "tam_15x21",
+"subNome": "15x21cm",
+"nome": "15x21cm — 90g Brilho Meia A4 (Frente e Verso)",
+"material": "90g Brilho (Meia A4)",
+"acab": "15x21cm",
+"impressao": "Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Mesmo formato meia A4 em couché brilho 90g, com os dois lados impressos — ideal pra cardápios com mais itens ou catálogos simples.",
+"curiosidade": "Cardápios de restaurante costumam usar esse tamanho justamente por caber bem numa mesa sem ocupar espaço demais.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "1.000 un.",
+"preco": 400.0
+},
+{
+"label": "2.500 un.",
+"preco": 500.0
+},
+{
+"label": "5.000 un.",
+"preco": 750.0
+}
+],
+"img": "img/produtos/panfletos-p6.webp"
+},
+{
+"id": "p7",
+"sub": "tam_15x21",
+"subNome": "15x21cm",
+"nome": "15x21cm — 115g Brilho Meia A4 (Frente)",
+"material": "115g Brilho (Meia A4)",
+"acab": "15x21cm",
+"impressao": "Frente",
+"prazo": "3 a 5 dias úteis",
+"obs": "Papel couché brilho 115g em formato meia A4 — o acabamento mais robusto passa uma sensação mais premium pro material.",
+"curiosidade": "O papel mais grosso segura melhor em expositores e balcões, sem dobrar ou cair com facilidade.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "1.000 un.",
+"preco": 680.0
+},
+{
+"label": "2.500 un.",
+"preco": 750.0
+},
+{
+"label": "5.000 un.",
+"preco": 1200.0
+}
+],
+"img": "img/produtos/panfletos-p7.webp"
+},
+{
+"id": "p8",
+"sub": "tam_15x21",
+"subNome": "15x21cm",
+"nome": "15x21cm — 150g Brilho Meia A4 (Frente e Verso)",
+"material": "150g Brilho (Meia A4)",
+"acab": "15x21cm",
+"impressao": "Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "A versão mais completa da linha meia A4: papel couché brilho 150g, mais robusto, com os dois lados impressos.",
+"curiosidade": "Muito usado por clínicas e escritórios que querem passar mais credibilidade logo no material impresso.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "1.000 un.",
+"preco": 700.0
+},
+{
+"label": "2.500 un.",
+"preco": 720.0
+},
+{
+"label": "5.000 un.",
+"preco": 1300.0
+}
+],
+"img": "img/produtos/panfletos-p8.webp"
+},
+{
+"id": "p9",
+"sub": "tam_21x30",
+"subNome": "21x30cm (A4)",
+"nome": "21x30cm — 115g Brilho A4 (Frente)",
+"material": "115g Brilho (A4)",
+"acab": "21x30cm",
+"impressao": "Frente",
+"prazo": "3 a 5 dias úteis",
+"obs": "Panfleto no formato A4 inteiro, papel couché brilho 115g — ideal pra cartazes, mala direta mais robusta ou material de ponto de venda.",
+"curiosidade": "O A4 é o mesmo tamanho de uma folha de ofício comum, o que facilita encaixar em pastas, expositores e envelopes padrão.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "25 un.",
+"preco": 134.0
+},
+{
+"label": "100 un.",
+"preco": 262.0
+},
+{
+"label": "500 un.",
+"preco": 598.0
+}
+],
+"img": "img/produtos/panfletos-p9.webp"
+},
+{
+"id": "p10",
+"sub": "tam_21x30",
+"subNome": "21x30cm (A4)",
+"nome": "21x30cm — 150g Brilho A4 (Frente e Verso)",
+"material": "150g Brilho (A4)",
+"acab": "21x30cm",
+"impressao": "Frente e Verso",
+"prazo": "3 a 5 dias úteis",
+"obs": "Versão A4 completa, em papel couché brilho 150g, mais espesso pra suportar impressão nos dois lados sem transparência.",
+"curiosidade": "Formato bastante usado por imobiliárias e eventos, que precisam de bastante espaço pra fotos e texto.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "25 un.",
+"preco": 160.0
+},
+{
+"label": "100 un.",
+"preco": 400.0
+},
+{
+"label": "500 un.",
+"preco": 1500.0
+}
+],
+"img": "img/produtos/panfletos-p10.webp"
+}
+],
+"banners": [
+{
+"id": "p1",
+"sub": "lona_brilho",
+"subNome": "Lona 480g Brilho",
+"nome": "Banner ou faixa - Lona 480g Brilho — Acabamento em Madeira",
+"material": "Lona 480g Brilho",
+"acab": "Acabamento com madeira nas pontas",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Lona 480g com acabamento brilhante, pronta pra pendurar — vem com ripas de madeira presas nas duas pontas.",
+"curiosidade": "O acabamento em madeira facilita pendurar o banner com barbante ou corda, sem precisar furar nem usar ilhós.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "60×40cm",
+"preco": 55.0
+},
+{
+"label": "80×50cm",
+"preco": 55.0
+},
+{
+"label": "90×60cm",
+"preco": 64.8
+},
+{
+"label": "100×70cm",
+"preco": 84.0
+},
+{
+"label": "120×80cm",
+"preco": 115.2
+},
+{
+"label": "100×100cm",
+"preco": 120.0
+},
+{
+"label": "120×100cm",
+"preco": 144.0
+},
+{
+"label": "150×100cm",
+"preco": 180.0
+},
+{
+"label": "180×100cm",
+"preco": 216.0
+},
+{
+"label": "200×100cm",
+"preco": 240.0
+},
+{
+"label": "200×120cm",
+"preco": 288.0
+},
+{
+"label": "250×100cm",
+"preco": 300.0
+},
+{
+"label": "300×100cm",
+"preco": 360.0
+}
+],
+"img": "img/produtos/banners-p1.webp",
+"m2livre": 120.0,
+"minimo": 55.0
+},
+{
+"id": "p2",
+"sub": "lona_fosco",
+"subNome": "Lona 480g Fosco",
+"nome": "Banner Lona 480g Fosco — Acabamento em Madeira",
+"material": "Lona 480g Fosco",
+"acab": "Acabamento com madeira nas pontas",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Lona 480g com acabamento fosco (sem reflexo), pronta pra pendurar — vem com ripas de madeira presas nas duas pontas.",
+"curiosidade": "O fosco evita reflexo de luz nas fotos e em ambientes com muita claridade, ficando mais fácil de ler de longe.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "60×40cm",
+"preco": 55.0
+},
+{
+"label": "80×50cm",
+"preco": 55.0
+},
+{
+"label": "90×60cm",
+"preco": 70.2
+},
+{
+"label": "100×70cm",
+"preco": 91.0
+},
+{
+"label": "120×80cm",
+"preco": 124.8
+},
+{
+"label": "100×100cm",
+"preco": 130.0
+},
+{
+"label": "120×100cm",
+"preco": 156.0
+},
+{
+"label": "150×100cm",
+"preco": 195.0
+},
+{
+"label": "180×100cm",
+"preco": 234.0
+},
+{
+"label": "200×100cm",
+"preco": 260.0
+},
+{
+"label": "200×120cm",
+"preco": 312.0
+},
+{
+"label": "250×100cm",
+"preco": 325.0
+},
+{
+"label": "300×100cm",
+"preco": 390.0
+}
+],
+"img": "img/produtos/banners-p2.webp",
+"m2livre": 130.0,
+"minimo": 55.0
+},
+{
+"id": "p3",
+"sub": "lona_ilhos",
+"subNome": "Lona Ilhós Total",
+"nome": "Lona Ilhós Total — Brilho",
+"material": "Lona 480g Brilho",
+"acab": "Ilhós total ao redor de toda a peça",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Lona com ilhós (furinhos com anel metálico) ao redor de toda a borda, pronta pra fixar em qualquer estrutura com corda ou abraçadeira.",
+"curiosidade": "O ilhós total dá mais pontos de fixação que o acabamento em madeira — ideal pra banners expostos ao vento, como em fachadas e eventos ao ar livre.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "60×40cm",
+"preco": 55.0
+},
+{
+"label": "80×50cm",
+"preco": 58.0
+},
+{
+"label": "90×60cm",
+"preco": 78.3
+},
+{
+"label": "100×70cm",
+"preco": 101.5
+},
+{
+"label": "120×80cm",
+"preco": 139.2
+},
+{
+"label": "100×100cm",
+"preco": 145.0
+},
+{
+"label": "120×100cm",
+"preco": 174.0
+},
+{
+"label": "150×100cm",
+"preco": 217.5
+},
+{
+"label": "180×100cm",
+"preco": 261.0
+},
+{
+"label": "200×100cm",
+"preco": 290.0
+},
+{
+"label": "200×120cm",
+"preco": 348.0
+},
+{
+"label": "250×100cm",
+"preco": 362.5
+},
+{
+"label": "300×100cm",
+"preco": 435.0
+}
+],
+"img": "img/produtos/banners-p3.webp",
+"m2livre": 145.0,
+"minimo": 55.0
+},
+{
+"id": "p4",
+"sub": "placas_ps",
+"subNome": "Placas PS",
+"nome": "Placa PS 1mm Branco",
+"material": "Poliestireno (PS) 1mm",
+"acab": "Branco",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Placa rígida de poliestireno 1mm na cor branca — ótima pra sinalização interna e placas informativas leves.",
+"curiosidade": "O PS é bem mais leve que o MDF ou acrílico, mas ainda assim rígido o bastante pra ficar em pé sozinho ou ser parafusado na parede.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 105.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/banners-p4.webp"
+},
+{
+"id": "p5",
+"sub": "placas_ps",
+"subNome": "Placas PS",
+"nome": "Placa PS 2mm Branco",
+"material": "Poliestireno (PS) 2mm",
+"acab": "Branco",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Placa rígida de poliestireno 2mm na cor branca — mais espessa e resistente que a de 1mm.",
+"curiosidade": "A espessura de 2mm aguenta melhor peças grandes sem entortar nas bordas.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 135.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/banners-p5.webp"
+},
+{
+"id": "p6",
+"sub": "placas_ps",
+"subNome": "Placas PS",
+"nome": "Placa PS 1mm Fosco",
+"material": "Poliestireno (PS) 1mm",
+"acab": "Fosco",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Placa rígida de poliestireno 1mm com acabamento fosco, sem reflexo de luz.",
+"curiosidade": "O fosco é bem usado em placas que ficam perto de janelas ou luz direta, pra não ofuscar quem está lendo.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 135.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/banners-p6.webp"
+},
+{
+"id": "p7",
+"sub": "placas_ps",
+"subNome": "Placas PS",
+"nome": "Placa PS 1mm Laminado Brilho",
+"material": "Poliestireno (PS) 1mm",
+"acab": "Laminado Brilho",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Placa de poliestireno 1mm com laminação brilhante — uma camada extra de proteção sobre a impressão.",
+"curiosidade": "A laminação protege contra riscos e um pouco de umidade, prolongando a vida útil da placa.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 175.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/banners-p7.webp"
+},
+{
+"id": "p8",
+"sub": "placas_ps",
+"subNome": "Placas PS",
+"nome": "Placa PS 2mm Laminado Brilho",
+"material": "Poliestireno (PS) 2mm",
+"acab": "Laminado Brilho",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Placa de poliestireno 2mm com laminação brilhante — a versão mais espessa com proteção extra.",
+"curiosidade": "Combina a resistência do 2mm com a durabilidade da laminação — boa opção pra placas de uso mais pesado.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 195.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/banners-p8.webp"
+},
+{
+"id": "p9",
+"sub": "placas_ps",
+"subNome": "Placas PS",
+"nome": "Placa PS 2mm Laminado Fosco",
+"material": "Poliestireno (PS) 2mm",
+"acab": "Laminado Fosco",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Placa de poliestireno 2mm com laminação fosca — proteção extra sem reflexo de luz.",
+"curiosidade": "É a opção mais resistente e discreta da linha PS, sem brilho nem reflexo.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 200.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/banners-p9.webp"
+}
+],
+"adesivos": [
+{
+"id": "p1",
+"sub": "etiquetas",
+"subNome": "Etiquetas",
+"nome": "Etiquetas — Meio-corte Quadrado/Retangular",
+"material": "Papel Adesivo 130g",
+"acab": "Meio-corte Quadrado/Ret.",
+"impressao": "",
+"prazo": "2 a 3 dias úteis",
+"obs": "Cartela de etiquetas em papel adesivo 130g, com meio-corte no formato quadrado ou retangular — fácil de destacar uma por uma.",
+"curiosidade": "O meio-corte deixa as etiquetas presas ao papel base até a hora de usar, sem precisar recortar na tesoura.",
+"alerta": "",
+"unidade": "por cartela",
+"opcoes": [
+{
+"label": "por cartela",
+"preco": 15.0
+}
+],
+"img": "img/produtos/adesivos-p1.webp"
+},
+{
+"id": "p2",
+"sub": "etiquetas",
+"subNome": "Etiquetas",
+"nome": "Etiquetas — Corte Redondo",
+"material": "Papel Adesivo 130g",
+"acab": "Corte Redondo",
+"impressao": "",
+"prazo": "2 a 3 dias úteis",
+"obs": "Cartela de etiquetas redondas em papel adesivo 130g, com corte especial no formato circular.",
+"curiosidade": "Etiquetas redondas são super usadas em potes, embalagens e lacres de produtos artesanais.",
+"alerta": "",
+"unidade": "por cartela",
+"opcoes": [
+{
+"label": "por cartela",
+"preco": 17.0
+}
+],
+"img": "img/produtos/adesivos-p2.webp"
+},
+{
+"id": "p3",
+"sub": "etiquetas",
+"subNome": "Etiquetas",
+"nome": "Folha Adesiva — Sem Corte",
+"material": "Papel Adesivo 130g",
+"acab": "Sem corte",
+"impressao": "",
+"prazo": "1 a 2 dias úteis",
+"obs": "Folha adesiva lisa, sem nenhum corte — você recorta do jeito que precisar depois de colada ou antes de aplicar.",
+"curiosidade": "Ótima opção pra quem vai fazer o próprio recorte manual ou usar a folha inteira como capa/adesivo grande.",
+"alerta": "",
+"unidade": "por cartela",
+"opcoes": [
+{
+"label": "por cartela",
+"preco": 10.0
+}
+],
+"img": "img/produtos/adesivos-p3.webp"
+},
+{
+"id": "p11",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo com Recorte — Vinil Branco Brilho",
+"material": "Vinil Branco Brilho",
+"acab": "Recorte especial (2mm de sangria)",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil branco brilhante impresso e recortado no contorno exato da sua arte, com 2mm de sangria pra garantir acabamento perfeito.",
+"curiosidade": "O recorte especial segue o contorno do desenho, sem sobrar cantos retos — ótimo pra logos e formatos irregulares.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 100.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p11.webp"
+},
+{
+"id": "p17",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo com Recorte — Vinil Branco Fosco",
+"material": "Vinil Branco Fosco",
+"acab": "Recorte especial (2mm de sangria)",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil branco fosco impresso e recortado no contorno da arte, com 2mm de sangria.",
+"curiosidade": "O acabamento fosco disfarça digitais e reflexos, ficando com aparência mais discreta e elegante que o brilho.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 120.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p17.webp"
+},
+{
+"id": "p19",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo com Recorte — Branco Brilho Com Verniz",
+"material": "Vinil Branco Brilho",
+"acab": "Recorte especial com verniz (2mm sangria)",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil branco brilho com verniz de proteção, recortado no contorno da arte com 2mm de sangria.",
+"curiosidade": "O verniz extra protege contra riscos e chuva, aumentando bastante a durabilidade em uso externo.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 150.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p19.webp"
+},
+{
+"id": "p20",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo com Recorte — Transparente Brilho",
+"material": "Vinil Transparente Brilho",
+"acab": "Recorte especial (2mm de sangria)",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil transparente sem fundo branco, recortado no contorno da arte, com 2mm de sangria.",
+"curiosidade": "Como não tem fundo branco, só a tinta impressa fica visível — dá um efeito de 'flutuando' sobre vidros e superfícies claras.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 120.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p20.webp"
+},
+{
+"id": "p21",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo Laminado c/Recorte",
+"material": "Vinil Laminado Brilho",
+"acab": "Corte especial (2mm sangria)",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil brilhante laminado (camada extra de proteção), recortado no contorno especial da arte.",
+"curiosidade": "A laminação é uma camada plástica transparente aplicada por cima da impressão — deixa o adesivo bem mais resistente a riscos e sol.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 215.5,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p21.webp"
+},
+{
+"id": "p24",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo Casca de Ovo c/Recorte",
+"material": "Vinil Casca de Ovo Fosco",
+"acab": "Corte especial",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil fosco efeito 'casca de ovo', recortado no contorno especial — se despedaça ao tentar remover.",
+"curiosidade": "Esse material é famoso por ser quase impossível de tirar inteiro — por isso é tão usado em lacres e etiquetas de segurança.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 370.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p24.webp"
+},
+{
+"id": "p28",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo com Recorte — Transparente Com Verniz",
+"material": "Vinil Transparente Brilho",
+"acab": "Recorte especial com verniz (2mm sangria)",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil transparente com verniz de proteção, recortado no contorno da arte, com 2mm de sangria.",
+"curiosidade": "Combina o efeito transparente com uma camada extra de proteção, ideal pra peças que ficam expostas ao tempo.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 136.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p28.webp"
+},
+{
+"id": "p29",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo Jateado c/Recorte",
+"material": "Vinil Efeito Jateado",
+"acab": "Corte especial",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil com efeito jateado (aparência fosca e translúcida), recortado no contorno especial da arte.",
+"curiosidade": "O efeito jateado imita o vidro trabalhado, muito usado em portas e vitrines pra dar privacidade sem tampar totalmente a luz.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 215.5,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p29.webp"
+},
+{
+"id": "p31",
+"sub": "com_recorte",
+"subNome": "Com Recorte",
+"nome": "Adesivo Blackout c/Recorte",
+"material": "Vinil Fosco Blackout (bloqueia luz)",
+"acab": "Corte especial",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil fosco blackout (bloqueia a passagem de luz), recortado no contorno especial da arte.",
+"curiosidade": "Por bloquear totalmente a luz, é a opção certa pra quem precisa vedar visibilidade — usado até em janelas de estúdio.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 215.5,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p31.webp"
+},
+{
+"id": "p12",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo em Vinil — Branco Brilho Corte Reto",
+"material": "Vinil Branco Brilho",
+"acab": "Corte reto (rolos 100/125/150cm)",
+"impressao": "",
+"prazo": "1 dia útil",
+"obs": "Vinil branco brilhante, corte reto em rolo (disponível em 100, 125 ou 150cm de largura).",
+"curiosidade": "É a opção com o prazo mais rápido da linha — sai em só 1 dia útil.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 80.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p12.webp"
+},
+{
+"id": "p13",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo — Vinil Branco Fosco",
+"material": "Vinil Branco Fosco",
+"acab": "Sem acabamento",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil branco fosco, entregue sem nenhum acabamento adicional — pronto pra aplicar.",
+"curiosidade": "Por não ter camada extra de verniz ou laminação, é uma das opções mais em conta da linha de vinil.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 84.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p13.webp"
+},
+{
+"id": "p14",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo — Vinil Branco Brilho Com Verniz",
+"material": "Vinil Branco Brilho",
+"acab": "Com verniz de proteção",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil branco brilhante com verniz de proteção aplicado por cima da impressão.",
+"curiosidade": "O verniz ajuda a evitar que a tinta desbote com o sol, prolongando a vida útil do adesivo.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 108.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p14.webp"
+},
+{
+"id": "p15",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo Perfurado — Sem Verniz",
+"material": "Vinil Perfurado (visão unilateral)",
+"acab": "Corte reto, sem verniz",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil perfurado (visão unilateral), corte reto, sem verniz de proteção.",
+"curiosidade": "Os furinhos deixam ver de dentro pra fora sem perder a privacidade de fora pra dentro — clássico em vidros de loja e carros.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 102.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p15.webp"
+},
+{
+"id": "p16",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo — Vinil Branco Brilho Laminado",
+"material": "Vinil Branco Brilho",
+"acab": "Laminado",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil branco brilhante com laminação (camada plástica protetora) por cima da impressão.",
+"curiosidade": "A laminação é o que dá aquele acabamento 'de vitrine', mais grosso e resistente ao manuseio.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 140.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p16.webp"
+},
+{
+"id": "p18",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo — Transparente Brilho",
+"material": "Vinil Transparente Brilho",
+"acab": "Sem acabamento",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil transparente brilhante, sem acabamento adicional.",
+"curiosidade": "Ideal pra rótulos onde você quer que só a arte impressa apareça, sem nenhum fundo branco atrás.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 87.7,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p18.webp"
+},
+{
+"id": "p22",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo de Vitrine — Fundo Branco",
+"material": "Vinil Brilho para Vitrine",
+"acab": "Corte reto (arte enviada espelhada)",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil brilhante com fundo branco, corte reto — a arte deve ser enviada espelhada (invertida).",
+"curiosidade": "Como ele é colado do lado de dentro do vidro, a imagem precisa vir espelhada pra aparecer certa por fora.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 144.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p22.webp"
+},
+{
+"id": "p23",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo Blackout",
+"material": "Vinil Fosco Blackout (bloqueia luz)",
+"acab": "Corte reto",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil fosco blackout, corte reto — bloqueia a passagem de luz.",
+"curiosidade": "Muito usado em fachadas e vitrines pra criar privacidade total sem precisar de cortina ou persiana.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 100.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p23.webp"
+},
+{
+"id": "p25",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo — Jateado Fosco",
+"material": "Vinil Efeito Jateado Fosco",
+"acab": "Sem acabamento",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil com efeito jateado fosco, sem acabamento adicional.",
+"curiosidade": "Dá um efeito parecido com vidro texturizado, sem precisar mandar lixar o vidro de verdade.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 140.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p25.webp"
+},
+{
+"id": "p26",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo — Transparente Brilho Com Verniz",
+"material": "Vinil Transparente Brilho",
+"acab": "Com verniz de proteção",
+"impressao": "",
+"prazo": "3 dias úteis",
+"obs": "Vinil transparente brilhante com verniz de proteção.",
+"curiosidade": "O verniz melhora a resistência do transparente contra riscos, mantendo o efeito 'sem fundo'.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 120.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p26.webp"
+},
+{
+"id": "p27",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo Perfurado — Com Verniz",
+"material": "Vinil Perfurado (visão unilateral)",
+"acab": "Corte reto, com verniz",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil perfurado (visão unilateral), corte reto, com verniz de proteção.",
+"curiosidade": "A camada de verniz aumenta a durabilidade do perfurado em vidros de carro expostos ao sol o dia inteiro.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 130.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p27.webp"
+},
+{
+"id": "p30",
+"sub": "sem_recorte",
+"subNome": "Sem Recorte (Corte Reto)",
+"nome": "Adesivo — Vinil Branco Fosco Laminado",
+"material": "Vinil Branco Fosco",
+"acab": "Laminado",
+"impressao": "",
+"prazo": "2 dias úteis",
+"obs": "Vinil branco fosco com laminação (camada plástica protetora) por cima da impressão.",
+"curiosidade": "Junta o visual discreto do fosco com a resistência extra da laminação — bom equilíbrio custo x durabilidade.",
+"alerta": "",
+"unidade": "por m²",
+"m2": 160.0,
+"minimo": 85.0,
+"opcoes": [],
+"img": "img/produtos/adesivos-p30.webp"
+},
+{
+"id": "p8",
+"sub": "especiais",
+"subNome": "Especiais",
+"nome": "Adesivo DTF — Laminação UV (Cartela A3)",
+"material": "Adesivo DTF UV",
+"acab": "Recorte especial · Cartela A3",
+"impressao": "",
+"prazo": "3 a 4 dias úteis",
+"obs": "Resiste a temperatura alta e a lavagens. Extremamente duradouro.",
+"curiosidade": "A cartela A3 rende bem mais etiquetas por folha, saindo mais em conta por unidade em pedidos grandes.",
+"alerta": "",
+"unidade": "cartela A3",
+"opcoes": [
+{
+"label": "cartela A3",
+"preco": 90.0
+}
+],
+"img": "img/produtos/adesivos-p8.webp"
+},
+{
+"id": "p9",
+"sub": "especiais",
+"subNome": "Especiais",
+"nome": "Adesivo Holográfico (Cartela A4)",
+"material": "Vinil Holográfico — Fundo Branco",
+"acab": "Recorte especial · Cartela A4",
+"impressao": "",
+"prazo": "3 a 4 dias úteis",
+"obs": "Vinil holográfico com fundo branco, recorte especial no contorno da sua arte, em cartela A4.",
+"curiosidade": "O efeito holográfico muda de cor conforme o ângulo da luz — chama muita atenção em embalagens.",
+"alerta": "",
+"unidade": "cartela A4",
+"opcoes": [
+{
+"label": "cartela A4",
+"preco": 144.0
+}
+],
+"img": "img/produtos/adesivos-p9.webp"
+}
+],
+"camisetas": [
+{
+"id": "p2",
+"sub": "sublimacao_total",
+"subNome": "Sublimação Total",
+"nome": "Camiseta Uniforme de Jogador — Sublimação Total",
+"material": "Poliéster (uniforme esportivo)",
+"acab": "Sublimação total · Gola V ou Gola Redonda",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "⚠️ A sublimação total é exclusiva para o uniforme de jogador. A estampa cobre a camiseta inteira (não só frente ou verso), por isso o processo é diferente dos demais modelos.",
+"curiosidade": "Uniformes de time costumam usar sublimação porque aguenta lavagens frequentes sem desbotar o número e o nome do jogador.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 75.0
+}
+],
+"img": "img/produtos/camisetas-p2.webp"
+},
+{
+"id": "p1",
+"sub": "sublimacao_comum",
+"subNome": "Sublimação Comum",
+"nome": "Camiseta Poliéster — Sublimação Comum (Frente e Verso)",
+"material": "Poliéster",
+"acab": "Sublimação comum · Frente e Verso",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "⚠️ Diferente da sublimação total (exclusiva do uniforme), aqui a estampa cobre só a frente e o verso da camiseta — não a peça inteira.",
+"curiosidade": "A sublimação só funciona bem em tecido sintético (poliéster), por isso não dá pra fazer em camiseta 100% algodão.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 45.0
+}
+],
+"img": "img/produtos/camisetas-p1.webp"
+},
+{
+"id": "p3",
+"sub": "dtf",
+"subNome": "DTF Premium",
+"nome": "Camiseta Algodão 30.1 — DTF Premium",
+"material": "Algodão 30.1",
+"acab": "DTF Premium · Frente (peito)",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "⚠️ Estampa aplicada só na frente (região do peito). Não inclui estampa no verso — se precisar de verso também, é orçado à parte.",
+"curiosidade": "O algodão 30.1 é mais fino e leve que o tradicional, com um caimento mais macio — bem popular em camisetas de estampa autoral.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 55.0
+}
+],
+"img": "img/produtos/camisetas-p3.webp"
+},
+{
+"id": "p4",
+"sub": "dtf",
+"subNome": "DTF Premium",
+"nome": "Camiseta Dry Fit — DTF Premium",
+"material": "Dry Fit",
+"acab": "DTF Premium · Frente (peito)",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "⚠️ Estampa aplicada só na frente (região do peito). Não inclui estampa no verso — se precisar de verso também, é orçado à parte.",
+"curiosidade": "O dry fit absorve o suor e seca rápido — por isso é a escolha padrão pra uniformes esportivos e academias.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 55.0
+}
+],
+"img": "img/produtos/camisetas-p4.webp"
+},
+{
+"id": "p5",
+"sub": "dtf",
+"subNome": "DTF Premium",
+"nome": "Camiseta Poliéster — DTF Premium",
+"material": "Poliéster",
+"acab": "DTF Premium · Frente (peito)",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "⚠️ Estampa aplicada só na frente (região do peito). Não inclui estampa no verso — se precisar de verso também, é orçado à parte.",
+"curiosidade": "O DTF funciona em quase qualquer tecido (diferente da sublimação), por isso dá pra usar tanto no poliéster quanto no algodão.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 50.0
+}
+],
+"img": "img/produtos/camisetas-p5.webp"
+},
+{
+"id": "p8",
+"sub": "dtf",
+"subNome": "DTF Premium",
+"nome": "Camiseta Algodão 30.1 — DTF Premium (Frente e Verso)",
+"material": "Algodão 30.1",
+"acab": "DTF Premium · Frente e Verso",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Camiseta 100% algodão fio 30.1 com estampa DTF Premium na frente e no verso. 📏 Regra de tamanho: frente até 10cm de estampa, costas até o máximo de 25x40cm.",
+"curiosidade": "O algodão 30.1 é mais fino e leve que o tradicional, com um caimento mais macio — bem popular em camisetas de estampa autoral.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 60.0
+}
+],
+"img": "img/produtos/camisetas-p8.webp"
+},
+{
+"id": "p9",
+"sub": "dtf",
+"subNome": "DTF Premium",
+"nome": "Camiseta Dry Fit — DTF Premium (Frente e Verso)",
+"material": "Dry Fit",
+"acab": "DTF Premium · Frente e Verso",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Camiseta em tecido dry fit (secagem rápida) com estampa DTF Premium na frente e no verso. 📏 Regra de tamanho: frente até 10cm de estampa, costas até o máximo de 25x40cm.",
+"curiosidade": "O dry fit absorve o suor e seca rápido — por isso é a escolha padrão pra uniformes esportivos e academias.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 60.0
+}
+],
+"img": "img/produtos/camisetas-p9.webp"
+},
+{
+"id": "p10",
+"sub": "dtf",
+"subNome": "DTF Premium",
+"nome": "Camiseta Poliéster — DTF Premium (Frente e Verso)",
+"material": "Poliéster",
+"acab": "DTF Premium · Frente e Verso",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Camiseta 100% poliéster com estampa DTF Premium na frente e no verso. 📏 Regra de tamanho: frente até 10cm de estampa, costas até o máximo de 25x40cm.",
+"curiosidade": "O DTF funciona em quase qualquer tecido (diferente da sublimação), por isso dá pra usar tanto no poliéster quanto no algodão.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 55.0
+}
+],
+"img": "img/produtos/camisetas-p10.webp"
+},
+{
+"id": "p6",
+"sub": "estampa_avulsa",
+"subNome": "Estampa Avulsa (sua peça)",
+"nome": "Estampa Avulsa — Até 10cm",
+"material": "Sua peça (cliente traz a camiseta/blusa)",
+"acab": "Estampa até 10cm — ideal pra logo pequeno no peito",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Você traz sua própria camiseta ou blusa e a gente aplica só a estampa, no tamanho de até 10cm.",
+"curiosidade": "Ótimo pra quem já tem a peça em casa e só precisa personalizar com um logo ou desenho pequeno.",
+"alerta": "⚠️ Não nos responsabilizamos por qualquer tipo de dano na peça que o cliente traz pra estampar.",
+"unidade": "cada estampa",
+"opcoes": [
+{
+"label": "cada estampa",
+"preco": 15.0
+}
+],
+"img": "img/produtos/camisetas-p6.webp"
+},
+{
+"id": "p7",
+"sub": "estampa_avulsa",
+"subNome": "Estampa Avulsa (sua peça)",
+"nome": "Estampa Avulsa — Acima de 10cm (até 25x40cm)",
+"material": "Sua peça (cliente traz a camiseta/blusa)",
+"acab": "Estampa acima de 10cm, até o máximo de 25x40cm — ideal pras costas",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Você traz sua própria camiseta ou blusa e a gente aplica a estampa maior, até o tamanho máximo de 25x40cm — tamanho ideal pra estampas nas costas.",
+"curiosidade": "O tamanho máximo de 25x40cm cobre bem a maioria dos desenhos grandes de costas, sem invadir as costuras laterais.",
+"alerta": "⚠️ Não nos responsabilizamos por qualquer tipo de dano na peça que o cliente traz pra estampar.",
+"unidade": "cada estampa",
+"opcoes": [
+{
+"label": "cada estampa",
+"preco": 30.0
+}
+],
+"img": "img/produtos/camisetas-p7.webp"
+}
+],
+"canecas": [
+{
+"id": "p1",
+"sub": "canecas",
+"subNome": "Canecas",
+"nome": "Caneca de Alça Branca",
+"material": "Cerâmica branca",
+"acab": "Impressão personalizada · Caixinha comum inclusa",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Caneca branca de alça com impressão personalizada, acompanha caixinha comum. Quer uma caixinha com o visual da sua marca? Adicione a caixinha personalizada por mais R$5,00.",
+"curiosidade": "A caixinha comum já protege bem a caneca no transporte — a personalizada é só um upgrade visual pra quem quer presentear.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 35.0
+}
+],
+"caixinha": 5.0,
+"img": "img/produtos/canecas-p1.webp",
+"caixinhaImg": "img/produtos/canecas-caixinha.webp"
+},
+{
+"id": "p2",
+"sub": "canecas",
+"subNome": "Canecas",
+"nome": "Caneca Qualquer Cor — 6 Cores Disponíveis",
+"material": "Cerâmica colorida",
+"acab": "6 opções de cor disponíveis",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Caneca colorida (por dentro, por fora ou na alça, dependendo do modelo escolhido), com 6 cores disponíveis.",
+"curiosidade": "Canecas coloridas costumam ser as preferidas pra brindes de empresa, porque combinam com a cor da marca.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 45.0
+}
+],
+"caixinha": 5.0,
+"img": "img/produtos/canecas-p2.webp",
+"caixinhaImg": "img/produtos/canecas-caixinha.webp"
+},
+{
+"id": "p3",
+"sub": "canecas",
+"subNome": "Canecas",
+"nome": "Caneca Mágica",
+"material": "Cerâmica com tinta termossensível",
+"acab": "Muda de estampa/cor com o calor",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Caneca mágica: a estampa fica escondida e só aparece quando você coloca uma bebida quente dentro.",
+"curiosidade": "O efeito usa uma tinta termossensível que muda de cor com o calor — por isso a estampa 'aparece' só quando esquenta.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 50.0
+}
+],
+"caixinha": 5.0,
+"img": "img/produtos/canecas-p3.webp",
+"caixinhaImg": "img/produtos/canecas-caixinha.webp"
+},
+{
+"id": "p4",
+"sub": "canecas",
+"subNome": "Canecas",
+"nome": "Caneca com DTF - Bocão",
+"material": "Cerâmica",
+"acab": "Estampa em DTF",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Caneca com estampa aplicada em DTF, com cores vivas e boa durabilidade mesmo lavando com esponja.",
+"curiosidade": "O DTF em caneca aguenta bem mais lavagens que um adesivo comum, sem descascar.",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 55.0
+}
+],
+"caixinha": 5.0,
+"img": "img/produtos/canecas-p4.webp",
+"caixinhaImg": "img/produtos/canecas-caixinha.webp"
+},
+{
+"id": "p5",
+"sub": "termicos",
+"subNome": "Garrafas e Copos Térmicos",
+"nome": "Garrafa Térmica com Visor Digital 450ml",
+"material": "Aço inox térmico",
+"acab": "Gravação a laser · Visor digital de temperatura",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Garrafa térmica 450ml com visor digital que mostra a temperatura do líquido, gravação a laser personalizada. Área de gravação: até 4cm de largura por 12cm de comprimento. Gravação em 1 lado inclusa; frente e verso sai R$15,00 a mais.",
+"curiosidade": "O visor digital é alimentado só pelo contato com o líquido — não precisa de pilha nem bateria.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 45.0
+},
+{
+"label": "Frente e Verso (+R$15)",
+"preco": 60.0
+}
+],
+"img": "img/produtos/canecas-p5.webp"
+},
+{
+"id": "p6",
+"sub": "termicos",
+"subNome": "Garrafas e Copos Térmicos",
+"nome": "Copo Térmico 473ml",
+"material": "Aço inox térmico",
+"acab": "Gravação a laser",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Copo térmico 473ml (tamanho padrão americano), com gravação a laser personalizada. Área de gravação: até 4,8cm de largura por 12cm de comprimento. Gravação em 1 lado inclusa; frente e verso sai R$15,00 a mais.",
+"curiosidade": "473ml é o famoso 'copo de 16oz', o tamanho mais popular de copo térmico no Brasil.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 45.0
+},
+{
+"label": "Frente e Verso (+R$15)",
+"preco": 60.0
+}
+],
+"img": "img/produtos/canecas-p6.webp"
+},
+{
+"id": "p7",
+"sub": "termicos",
+"subNome": "Garrafas e Copos Térmicos",
+"nome": "Garrafa Térmica 1,2L",
+"material": "Aço inox térmico",
+"acab": "Gravação a laser",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Garrafa térmica grande de 1,2 litro, com gravação a laser personalizada — ótima pra treino ou dia inteiro fora de casa. Área de gravação: até 4cm de largura por 12cm de comprimento. Gravação em 1 lado inclusa; frente e verso sai R$15,00 a mais.",
+"curiosidade": "1,2L é quase o dobro de uma garrafa comum — mantém a temperatura por muito mais tempo por ter mais volume isolado.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 85.0
+},
+{
+"label": "Frente e Verso (+R$15)",
+"preco": 100.0
+}
+],
+"img": "img/produtos/canecas-p7.webp"
+},
+{
+"id": "p8",
+"sub": "termicos",
+"subNome": "Garrafas e Copos Térmicos",
+"nome": "Copo Cuia 350ml",
+"material": "Aço inox térmico",
+"acab": "Gravação a laser",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Copo cuia térmico 350ml, com gravação a laser personalizada — formato clássico de cuia de chimarrão/tereré. Área de gravação: até 4,8cm de largura por 12cm de comprimento. Gravação em 1 lado inclusa; frente e verso sai R$15,00 a mais.",
+"curiosidade": "O formato de cuia é super usado pra chimarrão e tereré, mas também vira copo do dia a dia pra suco e água.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 48.0
+},
+{
+"label": "Frente e Verso (+R$15)",
+"preco": 63.0
+}
+],
+"img": "img/produtos/canecas-p8.webp"
+},
+{
+"id": "p9",
+"sub": "termicos",
+"subNome": "Garrafas e Copos Térmicos",
+"nome": "Garrafa Academia 800ml",
+"material": "Plástico/inox resistente",
+"acab": "Gravação a laser",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Garrafa 800ml estilo academia, leve e resistente, com gravação a laser personalizada. Área de gravação: até 4cm de largura por 12cm de comprimento. Gravação em 1 lado inclusa; frente e verso sai R$15,00 a mais.",
+"curiosidade": "800ml é o tamanho ideal pra quem quer beber bastante água no treino sem precisar reabastecer toda hora.",
+"alerta": "",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 90.0
+},
+{
+"label": "Frente e Verso (+R$15)",
+"preco": 105.0
+}
+],
+"img": "img/produtos/canecas-p9.webp"
+},
+{
+"id": "p7nt99ze",
+"sub": "termicos",
+"subNome": "Garrafas e Copos Térmicos",
+"nome": "Copo Térmico 473ml",
+"material": "Aço inox térmico",
+"acab": "Gravação a laser - 360º (total) ",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Copo térmico 473ml (tamanho padrão americano), com gravação a laser personalizada. Área de gravação: Total de fora a fora.",
+"curiosidade": "Você escolhe o tema e Johen monta sua arte (pode colocar o seu nome).",
+"alerta": "",
+"unidade": "cada",
+"opcoes": [
+{
+"label": "cada",
+"preco": 70.0
+}
+],
+"img": "img/produtos/canecas-p7nt99ze.webp"
+},
+{
+"id": "p10",
+"sub": "gravacao_avulsa",
+"subNome": "Gravação Avulsa (sua peça)",
+"nome": "Gravação a Laser Avulsa — Sua Peça",
+"material": "Sua peça (cliente traz o produto)",
+"acab": "Gravação a laser",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Você traz sua própria garrafa, copo ou caneca de metal e a gente faz só a gravação a laser.",
+"curiosidade": "É uma boa opção pra quem já ganhou o produto e só quer personalizar depois.",
+"alerta": "⚠️ Não nos responsabilizamos por qualquer tipo de dano na peça que o cliente traz pra gravar.",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 15.0
+},
+{
+"label": "Frente e Verso",
+"preco": 25.0
+}
+],
+"img": "img/produtos/canecas-p10.webp"
+},
+{
+"id": "p11",
+"sub": "gravacao_avulsa",
+"subNome": "Gravação Avulsa (sua peça)",
+"nome": "Gravação a Laser — Com Time",
+"material": "Sua peça (cliente traz o produto)",
+"acab": "Gravação a laser · Escudo ou nome do seu time",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Gravação a laser do escudo, nome ou frase do seu time na sua garrafa, copo ou caneca de metal.",
+"curiosidade": "",
+"alerta": "⚠️ Não nos responsabilizamos por qualquer tipo de dano na peça que o cliente traz pra gravar.",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 15.0
+},
+{
+"label": "Frente e Verso",
+"preco": 25.0
+}
+],
+"img": "img/produtos/canecas-p7.webp"
+},
+{
+"id": "p12",
+"sub": "gravacao_avulsa",
+"subNome": "Gravação Avulsa (sua peça)",
+"nome": "Gravação a Laser — Com Nome",
+"material": "Sua peça (cliente traz o produto)",
+"acab": "Gravação a laser · Nome ou frase",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Gravação a laser do seu nome, apelido ou de uma frase na sua garrafa, copo ou caneca de metal.",
+"curiosidade": "",
+"alerta": "⚠️ Não nos responsabilizamos por qualquer tipo de dano na peça que o cliente traz pra gravar.",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 15.0
+},
+{
+"label": "Frente e Verso",
+"preco": 25.0
+}
+],
+"img": "img/produtos/canecas-p9.webp"
+},
+{
+"id": "p13",
+"sub": "gravacao_avulsa",
+"subNome": "Gravação Avulsa (sua peça)",
+"nome": "Gravação a Laser — Com Logo",
+"material": "Sua peça (cliente traz o produto)",
+"acab": "Gravação a laser · Logo da empresa",
+"impressao": "",
+"prazo": "3 a 5 dias úteis",
+"obs": "Gravação a laser da logo da sua empresa na sua garrafa, copo ou caneca de metal. Ótimo pra brinde.",
+"curiosidade": "",
+"alerta": "⚠️ Não nos responsabilizamos por qualquer tipo de dano na peça que o cliente traz pra gravar.",
+"unidade": "",
+"opcoes": [
+{
+"label": "Gravação 1 lado",
+"preco": 15.0
+},
+{
+"label": "Frente e Verso",
+"preco": 25.0
+}
+],
+"img": "img/produtos/canecas-p6.webp"
+}
+]
+}
