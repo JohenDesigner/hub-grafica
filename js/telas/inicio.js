@@ -4,6 +4,8 @@ import { ETAPAS, NOMES_ETAPA, saldoAberto, calcularItem } from '../calc.js';
 import { moeda, data, hojeISO } from '../formato.js';
 import { esc, titulo } from '../ui.js';
 import { contarNaoLidas } from './conversas.js';
+import { carregarCfg, salvarCampoCfg } from './configuracoes.js';
+import { confirmar, avisar, abrirModal } from '../ui.js';
 import { NOMES_FORMA } from './receber.js';
 
 const PERIODOS = [['7d', '7 dias'], ['30d', '30 dias'], ['12m', '12 meses']];
@@ -68,10 +70,14 @@ const barraLinha = (rotulo, valorTxt, fracao, extra = '', href = '') => {
 
 export async function montar(el, _p, vivo) {
   titulo('Início');
-  const [fichas, pagsPedidos, clientes, naoLidas, balcao] = await Promise.all([
-    listar('fichas', { semExcluidos: true }), listar('pagamentos'), listar('clientes'), contarNaoLidas(), listar('vendas_balcao').catch(() => [])]);
+  const [fichas, pagsPedidos, clientes, naoLidas, balcao, cfg] = await Promise.all([
+    listar('fichas', { semExcluidos: true }), listar('pagamentos'), listar('clientes'), contarNaoLidas(), listar('vendas_balcao').catch(() => []), carregarCfg()]);
   // vendas do balcão entram no dinheiro recebido (gráfico, formas de pagamento), mas não nos pedidos
-  const pags = [...pagsPedidos, ...balcao.map(v => ({ ficha_id: null, pago_em: v.vendido_em, valor_centavos: v.total_centavos, forma: v.forma, balcao: true }))];
+  const pags = [...pagsPedidos, ...balcao.map(v => ({ ficha_id: null, pago_em: v.vendido_em, valor_centavos: v.total_centavos, forma: v.forma, criado_em: v.criado_em, balcao: true }))];
+  // "Zerar resumo": os números do período só contam o que foi lançado depois do zero. Nada é apagado.
+  const desde = cfg.resumo_desde || null;
+  const depois = r => !desde || (r.criado_em || '') >= desde;
+  const pagsTodos = pags, fichasTodas = fichas;
   if (!vivo()) return;
   const cli = new Map(clientes.map(c => [c.id, c]));
   const pagosPor = new Map();
@@ -113,7 +119,10 @@ export async function montar(el, _p, vivo) {
       <a class="atalho escuro" href="#balcao">Balcão<small>impressão e cópia rápida</small></a>
     </div>
     ${alertas.length ? `<section class="alertas" aria-label="Precisa de atenção">${alertas.map(([tipo, txt, href]) => `<a class="alerta-item ${tipo}" href="${href}"><span class="alerta-ponto" aria-hidden="true"></span><span>${esc(txt)}</span><span class="alerta-seta" aria-hidden="true">›</span></a>`).join('')}</section>` : ''}
-    <div class="cabeca"><h2>Resumo</h2><div class="segmentado painel-periodo" role="group" aria-label="Período">${PERIODOS.map(([k, n]) => `<button type="button" data-per="${k}" aria-pressed="${k === periodo}">${n}</button>`).join('')}</div></div>
+    <div class="cabeca"><h2>Resumo</h2>
+      <div class="resumo-acoes"><button type="button" class="btn btn-peq" id="r-historico">Histórico</button><button type="button" class="btn btn-peq" id="r-zerar">Zerar resumo</button></div></div>
+    ${desde ? `<p class="sub resumo-desde">Contando desde ${esc(new Date(desde).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }))} (zerado). O que veio antes está no Histórico.</p>` : ''}
+    <div class="cabeca"><div class="segmentado painel-periodo" role="group" aria-label="Período">${PERIODOS.map(([k, n]) => `<button type="button" data-per="${k}" aria-pressed="${k === periodo}">${n}</button>`).join('')}</div></div>
     <div id="painel"></div>
     <a class="btn btn-bloco" href="#desempenho">Ver gráficos de desempenho</a>
     <section class="cartao">
@@ -126,6 +135,7 @@ export async function montar(el, _p, vivo) {
 
   function painel() {
     const j = janela(hoje);
+    const pags = pagsTodos.filter(depois), fichas = fichasTodas.filter(depois);
     const noPer = (d, a = j.ini, b = j.fim) => d >= a && d <= b;
     const pagosPer = pags.filter(p => noPer(p.pago_em));
     const recebido = pagosPer.reduce((s, p) => s + p.valor_centavos, 0);
@@ -143,7 +153,7 @@ export async function montar(el, _p, vivo) {
     const ticket = fechadas.length ? Math.round(vendido / fechadas.length) : 0;
 
     // funil: quantos pedidos e quanto dinheiro parado em cada etapa (situação de agora)
-    const funil = ETAPAS.filter(e => e !== 'entregue').map(e => { const l = fichas.filter(f => f.etapa === e); return { e, n: l.length, v: l.reduce((s, f) => s + f.total_centavos, 0) }; });
+    const funil = ETAPAS.filter(e => e !== 'entregue').map(e => { const l = fichasTodas.filter(f => f.etapa === e); return { e, n: l.length, v: l.reduce((s, f) => s + f.total_centavos, 0) }; });
     const maxFunil = Math.max(...funil.map(x => x.n), 1);
 
     const porProduto = new Map(), porCliente = new Map(), porForma = new Map();
@@ -209,6 +219,41 @@ export async function montar(el, _p, vivo) {
       graf.addEventListener('pointerleave', esconder);
     }
   }
+
+  // resumo de um trecho de tempo (para guardar no histórico ao zerar)
+  function fotografar(de, ate) {
+    const dentro = r => (!de || (r.criado_em || '') >= de) && (r.criado_em || '') < ate;
+    const p = pagsTodos.filter(dentro), f = fichasTodas.filter(dentro).filter(x => !['orcamento', 'cancelado'].includes(x.etapa));
+    const formas = {}; p.forEach(x => { formas[x.forma] = (formas[x.forma] || 0) + x.valor_centavos; });
+    return { de, ate, recebido: p.reduce((s, x) => s + x.valor_centavos, 0), balcao: p.filter(x => x.balcao).reduce((s, x) => s + x.valor_centavos, 0),
+      vendas_balcao: p.filter(x => x.balcao).length, vendido: f.reduce((s, x) => s + x.total_centavos, 0), pedidos: f.length,
+      orcamentos: fichasTodas.filter(dentro).length, formas };
+  }
+  el.querySelector('#r-zerar').addEventListener('click', async () => {
+    if (!await confirmar('Zerar o resumo? Os números voltam a contar a partir de agora. Nenhum pedido, pagamento ou venda é apagado: o resumo de antes fica guardado no Histórico.', { ok: 'Zerar resumo' })) return;
+    const agora = new Date().toISOString();
+    const historico = Array.isArray(cfg.resumo_historico) ? cfg.resumo_historico : [];
+    try {
+      await salvarCampoCfg('resumo_historico', [fotografar(desde, agora), ...historico].slice(0, 60));
+      await salvarCampoCfg('resumo_desde', agora);
+      avisar('Resumo zerado. O anterior foi para o Histórico.');
+      montar(el, _p, vivo);
+    } catch (err) { avisar(err.message, 'erro'); }
+  });
+  el.querySelector('#r-historico').addEventListener('click', async () => {
+    const atual = await carregarCfg();
+    const lista = Array.isArray(atual.resumo_historico) ? atual.resumo_historico : [];
+    const quando = iso => iso ? new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'o começo';
+    const bloco = (r, tituloTxt) => `<div class="cartao hist-item"><b>${esc(tituloTxt)}</b><span class="sub">${r.de ? `De ${esc(quando(r.de))}` : 'Desde o começo'} até ${esc(r.agora ? 'agora' : quando(r.ate))}</span>
+      <div class="hist-grade"><span>Recebido</span><b class="valor">${moeda(r.recebido)}</b>
+      <span>Do balcão</span><b class="valor">${moeda(r.balcao)}${r.vendas_balcao ? ` <small>(${r.vendas_balcao} ${r.vendas_balcao === 1 ? 'venda' : 'vendas'})</small>` : ''}</b>
+      <span>Vendido em pedidos</span><b class="valor">${moeda(r.vendido)}</b>
+      <span>Pedidos fechados</span><b class="valor">${r.pedidos} de ${r.orcamentos} ${r.orcamentos === 1 ? 'orçamento' : 'orçamentos'}</b>
+      ${Object.entries(r.formas || {}).map(([k, v]) => `<span>${esc(NOMES_FORMA[k] || k)}</span><b class="valor">${moeda(v)}</b>`).join('')}</div></div>`;
+    abrirModal(`<div class="modal-topo"><h2>Histórico do resumo</h2><button class="icone-btn" data-fechar aria-label="Fechar">✕</button></div>
+      ${bloco({ ...fotografar(desde, new Date(Date.now() + 1000).toISOString()), agora: true }, desde ? 'Agora (desde o último zero)' : 'Agora')}
+      ${lista.length ? lista.map((r, n) => bloco(r, `Período ${lista.length - n}`)).join('') : '<p class="sub">Ainda não há resumos zerados. Quando você tocar em "Zerar resumo", o resumo de antes aparece aqui.</p>'}`);
+  });
 
   el.querySelector('.painel-periodo').addEventListener('click', e => {
     const b = e.target.closest('[data-per]'); if (!b) return;

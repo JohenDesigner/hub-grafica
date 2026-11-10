@@ -355,3 +355,10 @@ body.com-painel{overflow:hidden}
 }
 .o-barra{display:flex;justify-content:flex-end}
 .o-barra .btn svg{margin-right:2px}
+/* zerar resumo e histórico */
+.resumo-acoes{display:flex;gap:8px}
+.resumo-desde{margin-top:-6px}
+.hist-item{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.hist-item > *{margin-top:0}
+.hist-grade{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:15px;margin-top:4px}
+.hist-grade small{font-weight:400;color:var(--texto-2)}

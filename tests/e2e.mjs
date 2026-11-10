@@ -315,6 +315,20 @@ try {
   await pg.goto(BASE + '#balcao'); await pg.waitForSelector('.bal-btn');
   ok(await pg.isHidden('#fab-balcao'), 'sem botão flutuante dentro da própria tela do balcão');
 
+  console.log('Zerar resumo');
+  await pg.goto(BASE + '#inicio'); await pg.waitForSelector('#painel .kpi');
+  const antes = await texto('#painel .kpi >> nth=0');
+  ok(!antes.includes('R$ 0,00'), 'resumo tem valores antes de zerar');
+  await pg.click('#r-zerar'); await pg.click('#modal [data-ok]');
+  await pg.waitForSelector('.resumo-desde');
+  ok((await texto('#painel .kpi >> nth=0')).includes('R$ 0,00'), 'zerar deixa o recebido em zero');
+  ok(await pg.evaluate(() => window.__mock.banco().t.pagamentos.length > 0 && window.__mock.banco().t.vendas_balcao.length > 0), 'zerar não apaga pagamentos nem vendas');
+  await pg.click('#r-historico'); await pg.waitForSelector('#modal .hist-item');
+  ok(await pg.locator('#modal .hist-item').count() === 2, 'histórico mostra agora + período zerado');
+  ok(!(await texto('#modal .hist-item >> nth=1')).includes('R$ 0,00 '), 'período guardado tem os valores de antes');
+  await print('21-historico');
+  await pg.click('#modal [data-fechar]');
+
   console.log('IA e desempenho');
   await pg.goto(BASE + '#conversas'); await pg.waitForSelector('#cv-ia');
   await esperar(300);
