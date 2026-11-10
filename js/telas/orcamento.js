@@ -347,7 +347,8 @@ export function editorItem(produtos, existente, preProd = null) {
         opcoes: prod.opcoes, livre: base?.livre ?? false, largura_cm: base?.largura_cm ?? '', altura_cm: base?.altura_cm ?? '',
         preco: prod.preco, m2_livre: prod.m2_livre, minimo: prod.minimo, minimo_por: prod.minimo_por,
         acabamentos_produto: prod.acabamentos, acabamentos: base?.acabamentos ?? [], descricao: base?.descricao ?? '',
-        valor_manual: base?.valor_manual ?? null
+        valor_manual: base?.valor_manual ?? null,
+        ...(prod.detalhes?.complemento ? { complemento: prod.detalhes.complemento } : base?.complemento ? { complemento: base.complemento } : {})
       };
       const porUn = it.tipo === 'opcoes' && it.opcoes.some(o => /\bun\.?\s*$/i.test(o.label));
       const outra = it.opcao?.manual ? it.opcao : null;

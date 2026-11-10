@@ -114,7 +114,7 @@ export async function montarDetalhe(el, id, vivo) {
 
     <section class="cartao">
       <div class="cabeca"><h3 style="flex:1">Itens</h3>${ficha.etapa === 'orcamento' && !excluido ? `<a class="btn btn-peq" href="#orcamento/${ficha.id}">Editar orçamento</a>` : ''}</div>
-      ${(ficha.itens || []).map(it => `<div class="linha-item"><div class="meio"><b>${esc(it.quantidade)}× ${esc(it.nome)}</b><div class="det">${esc(detalheItem(it))}</div></div>
+      ${(ficha.itens || []).map(it => `<div class="linha-item"><div class="meio"><b>${esc(it.quantidade)}× ${esc(it.nome)}</b><div class="det">${esc(detalheItem(it))}</div>${it.complemento ? `<div class="det complemento">Complemento: ${esc(it.complemento)}</div>` : ''}</div>
         <span class="valor">${moeda(calcularItem(it).centavos)}</span></div>`).join('')}
       <div class="resumo">
         ${r.desconto ? `<span>Subtotal</span><span class="valor">${moeda(r.subtotal)}</span><span>Desconto</span><span class="valor">− ${moeda(r.desconto)}</span>` : ''}

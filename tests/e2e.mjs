@@ -327,7 +327,7 @@ try {
   await pg.goto(BASE + '#orcamento'); await pg.waitForSelector('#o-add');
   await pg.click('#o-add'); await pg.waitForSelector('#ei-criar');
   await pg.click('#ei-criar'); await pg.waitForSelector('#f-extra');
-  await pg.fill('#f-extra [name=nome]', 'Placa de PVC 3mm'); await pg.click('[data-tipo=unidade]'); await pg.fill('#f-extra [name=preco]', '45');
+  await pg.fill('#f-extra [name=nome]', 'Placa de PVC 3mm'); await pg.fill('#f-extra [name=preco]', '45');
   await pg.click('#f-extra [type=submit]');
   await pg.waitForFunction(() => document.querySelector('#modal .modal-topo h2')?.textContent.includes('Placa de PVC'));
   ok(true, 'depois de criar, já abre o item com o produto novo');
@@ -342,9 +342,32 @@ try {
   ok(true, 'cancelar o cadastro volta para a lista de produtos');
   await pg.click('#modal [data-fechar]');
 
+  console.log('Cadastro completo');
+  await pg.goto(BASE + '#produtos'); await pg.waitForSelector('#p-novo');
+  await pg.click('#p-novo'); await pg.waitForSelector('#f-extra [name=custo]');
+  await pg.fill('#f-extra [name=nome]', 'Envelope ofício timbrado');
+  await pg.fill('[name=referencia]', 'ENV-01'); await pg.fill('[name=grupo]', 'Papelaria'); await pg.fill('[name=formato]', '23×11 cm');
+  await pg.fill('[name=complemento]', 'usar papel 90g da prateleira 2');
+  await pg.fill('[name=custo]', '1'); await pg.locator('[name=custo]').blur();
+  await pg.fill('[name=margem_vista]', '150'); await pg.locator('[name=margem_vista]').blur();
+  ok((await pg.inputValue('[name=preco]')) === '2,50', 'custo + margem calcula o valor à vista');
+  await pg.fill('[name=preco_atacado]', '2'); await pg.locator('[name=preco_atacado]').blur();
+  ok((await pg.inputValue('[name=margem_atacado]')) === '100,00', 'valor digitado ajusta a margem');
+  await pg.check('[name=controla_estoque]'); await pg.fill('[name=estoque_atual]', '40'); await pg.fill('[name=estoque_min]', '50');
+  await pg.locator('#modal .modal-caixa').evaluate(e => { e.style.maxHeight = 'none'; }); await pg.locator('#modal .modal-caixa').screenshot({ path: 'tests/prints/23-cadastro.png' });
+  await pg.setViewportSize({ width: 1280, height: 900 }); await pg.locator('#modal .modal-caixa').screenshot({ path: 'tests/prints/23-cadastro-pc.png' }); await pg.setViewportSize({ width: 380, height: 820 });
+  await pg.click('#f-extra [type=submit]'); await esperar(400);
+  const env = await pg.evaluate(() => window.__mock.banco().t.produtos.find(p => p.nome === 'Envelope ofício timbrado'));
+  ok(env?.preco === 2.5 && env.detalhes?.referencia === 'ENV-01' && env.detalhes.custo === 1 && env.detalhes.estoque_atual === 40, 'salva cadastro completo');
+  await pg.fill('#p-busca', 'ENV-01');
+  ok((await texto('#p-lista')).includes('Envelope ofício') && (await texto('#p-lista')).includes('baixo'), 'busca pela referência e avisa estoque baixo');
+  await pg.click('#p-novo'); await pg.click('[data-servico="1"]');
+  ok(await pg.isHidden('#x-estoque'), 'serviço esconde o estoque');
+  await pg.click('#modal .modal-topo [data-fechar]');
+
   console.log('Produto por quantidade e valor');
   await pg.goto(BASE + '#produtos'); await pg.waitForSelector('#p-novo');
-  await pg.click('#p-novo'); await pg.waitForSelector('#x-qtd:not([hidden])');
+  await pg.click('#p-novo'); await pg.waitForSelector('#f-extra'); await pg.click('[data-tipo=qtd]'); await pg.waitForSelector('#x-qtd:not([hidden])');
   ok(await pg.locator('[data-linha=qtd]').count() === 3, 'já vem com 100, 500 e 1000');
   await pg.fill('#f-extra [name=nome]', 'Adesivo redondo 5cm');
   const linhas = pg.locator('[data-linha=qtd]');
