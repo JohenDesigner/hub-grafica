@@ -323,6 +323,25 @@ try {
   await pg.goto(BASE + '#balcao'); await pg.waitForSelector('.bal-btn');
   ok(await pg.isHidden('#fab-balcao'), 'sem botão flutuante dentro da própria tela do balcão');
 
+  console.log('Criar produto novo no orçamento');
+  await pg.goto(BASE + '#orcamento'); await pg.waitForSelector('#o-add');
+  await pg.click('#o-add'); await pg.waitForSelector('#ei-criar');
+  await pg.click('#ei-criar'); await pg.waitForSelector('#f-extra');
+  await pg.fill('#f-extra [name=nome]', 'Placa de PVC 3mm'); await pg.fill('#f-extra [name=preco]', '45');
+  await pg.click('#f-extra [type=submit]');
+  await pg.waitForFunction(() => document.querySelector('#modal .modal-topo h2')?.textContent.includes('Placa de PVC'));
+  ok(true, 'depois de criar, já abre o item com o produto novo');
+  ok(await pg.evaluate(() => window.__mock.banco().t.produtos.some(p => p.nome === 'Placa de PVC 3mm')), 'produto novo salvo em Produtos');
+  await pg.click('#modal [data-fechar]');
+  await pg.click('#o-add'); await pg.fill('#ei-busca', 'pvc');
+  ok((await texto('#ei-lista')).includes('Placa de PVC 3mm'), 'produto novo aparece na busca');
+  await pg.click('#modal [data-fechar]');
+  await pg.click('#o-add'); await pg.click('#ei-criar'); await pg.waitForSelector('#f-extra');
+  await pg.click('#f-extra ~ * [data-fechar], #modal .modal-topo [data-fechar]');
+  await pg.waitForSelector('#ei-criar');
+  ok(true, 'cancelar o cadastro volta para a lista de produtos');
+  await pg.click('#modal [data-fechar]');
+
   console.log('Zerar resumo');
   await pg.goto(BASE + '#inicio'); await pg.waitForSelector('#painel .kpi');
   const antes = await texto('#painel .kpi >> nth=0');

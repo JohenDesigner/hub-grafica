@@ -6,7 +6,7 @@ import { moeda, data, lerNumero, hojeISO, soDigitos } from '../formato.js';
 import { mensagem, linkWa, detalheItem } from '../whatsapp.js';
 import { esc, avisar, abrirModal, fecharModal, titulo, ICONE } from '../ui.js';
 import { ir } from '../rotas.js';
-import { todosProdutos, aPartirDe } from './produtos.js';
+import { todosProdutos, aPartirDe, formExtra, extraParaProduto } from './produtos.js';
 import { formClienteRapido } from './clientes.js';
 import { carregarCfg } from './configuracoes.js';
 import { registrarPagamento } from './receber.js';
@@ -160,8 +160,16 @@ export async function montar(el, param, vivo) {
 
     // itens
     q('#o-add').addEventListener('click', async () => {
-      const it = await editorItem(produtos, null);
-      if (it) { ficha.itens.push(it); mudou(); desenhar(); }
+      let r = await editorItem(produtos, null);
+      // "Criar produto novo" dentro da lista: cadastra e já volta configurando o item
+      while (r?.criarProduto) {
+        const reg = await new Promise(res => formExtra(null, s => res(s), { aoCancelar: () => res(null) }));
+        if (!reg) { r = await editorItem(produtos, null); continue; }
+        const novo = extraParaProduto(reg);
+        produtos.push(novo);
+        r = await editorItem(produtos, null, novo);
+      }
+      if (r) { ficha.itens.push(r); mudou(); desenhar(); }
     });
     q('#o-itens').addEventListener('click', async e => {
       const ed = e.target.closest('[data-editar]'), rm = e.target.closest('[data-remover]');
@@ -290,10 +298,10 @@ function produtoDoItem(it) {
     prazo_dias: it.prazo_dias };
 }
 
-export function editorItem(produtos, existente) {
+export function editorItem(produtos, existente, preProd = null) {
   return new Promise(resolve => {
     let pronto = null;
-    let prod = existente ? produtoDoItem(existente) : null;
+    let prod = existente ? produtoDoItem(existente) : preProd;
     const caixa = abrirModal('<div id="ei"></div>', { fechar: () => resolve(pronto) });
     const raiz = caixa.querySelector('#ei');
 
@@ -304,7 +312,9 @@ export function editorItem(produtos, existente) {
         <label class="campo"><span>Buscar</span><input id="ei-busca" type="search" autocomplete="off" placeholder="banner, cartão, caneca…"></label>
         <div class="abas" id="ei-cats" style="margin-top:12px"><button type="button" data-cat="" aria-pressed="true">Todos</button>
           ${Object.entries(NOMES_CATEGORIA).filter(([k]) => produtos.some(p => p.categoria === k)).map(([k, v]) => `<button type="button" data-cat="${k}" aria-pressed="false">${esc(v)}</button>`).join('')}</div>
-        <ul class="lista" id="ei-lista" style="margin-top:12px"></ul>`;
+        <ul class="lista" id="ei-lista" style="margin-top:12px"></ul>
+        <button type="button" class="btn btn-bloco" id="ei-criar" style="margin-top:12px">${ICONE.mais.replace('<svg', '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"')}Criar produto novo</button>`;
+      raiz.querySelector('#ei-criar').addEventListener('click', () => { pronto = { criarProduto: true }; fecharModal(); });
       raiz.querySelector('[data-fechar]').addEventListener('click', () => fecharModal());
       const desenhar = () => {
         const t = raiz.querySelector('#ei-busca').value.trim().toLowerCase();
@@ -313,7 +323,7 @@ export function editorItem(produtos, existente) {
         raiz.querySelector('#ei-lista').innerHTML = vis.length ? vis.map(p => `<li><button class="lista-item" data-p="${esc(p.id)}">
           <span class="meio"><span class="nome">${esc(p.nome)}</span><span class="det">${esc(NOMES_CATEGORIA[p.categoria] || '')}</span></span>
           <span class="fim valor" style="font-size:14px">${esc(aPartirDe(p))}</span></button></li>`).join('')
-          : '<li><p class="vazio">Nenhum produto. Cadastre um extra em Mais → Produtos.</p></li>';
+          : '<li><p class="vazio">Nenhum produto encontrado. Use "Criar produto novo" aqui embaixo.</p></li>';
       };
       desenhar();
       raiz.querySelector('#ei-busca').addEventListener('input', desenhar);

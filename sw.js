@@ -1,5 +1,5 @@
 // Guarda os arquivos do app para abrir sem internet. Dados (Supabase) e catálogo do site não passam por aqui.
-const VERSAO = 'hub-v10';
+const VERSAO = 'hub-v11';
 const ARQUIVOS = [
   './', 'index.html', 'manifest.json', 'css/app.css',
   'img/logo-icone.webp', 'img/logo-wordmark.webp', 'icons/icon-192.png', 'icons/icon-512.png',

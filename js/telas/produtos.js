@@ -8,7 +8,7 @@ import { esc, avisar, confirmar, abrirModal, fecharModal, titulo, ICONE } from '
 const NOME_TIPO = { opcoes: 'Opções', m2: 'Por m²', unidade: 'Por unidade' };
 const NOME_COBRANCA = { unidade: 'por unidade', m2: 'por m²', fixo: 'fixo' };
 
-function extraParaProduto(r) {
+export function extraParaProduto(r) {
   return { id: r.id, origem: 'hub', categoria: 'extras', nome: r.nome, tipo: r.tipo,
     opcoes: (r.opcoes || []).map(o => ({ label: o.label, preco: Number(o.preco) })),
     preco: Number(r.preco), m2_livre: Number(r.m2_livre), minimo: Number(r.minimo), minimo_por: r.minimo_por,
@@ -40,7 +40,7 @@ export async function montar(el, _p, vivo, forcar = false) {
   if (!vivo()) return;
   const site = lista.filter(p => p.origem === 'site').length;
   el.innerHTML = `
-    <div class="cabeca"><h2>Produtos</h2><button class="btn btn-primario" id="p-novo">${ICONE.mais.replace('<svg', '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"')}Extra</button></div>
+    <div class="cabeca"><h2>Produtos</h2><button class="btn btn-primario" id="p-novo">${ICONE.mais.replace('<svg', '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"')}Novo produto</button></div>
     <div class="${offline ? 'aviso' : 'aviso info'}" id="p-estado">
       ${offline ? (quando ? `Sem internet: usando a cópia de ${hora(quando)}.` : 'Sem internet e sem cópia do catálogo do site.')
                 : `Preços do site — ${site} produtos, atualizado ${hora(quando)}.`}
@@ -105,11 +105,12 @@ function linhaAcab(a = { nome: '', valor: '', cobranca: 'unidade' }) {
     <button type="button" class="icone-btn" data-remover aria-label="Remover">${ICONE.lixo}</button></div>`;
 }
 
-function formExtra(p, depois) {
+export function formExtra(p, depois, { aoCancelar } = {}) {
   const r = p?._registro;
   let tipo = r?.tipo || 'unidade';
+  let salvouReg = null;
   const caixa = abrirModal(`
-    <div class="modal-topo"><h2>${r ? 'Editar produto extra' : 'Novo produto extra'}</h2><button class="icone-btn" data-fechar aria-label="Fechar">${ICONE.fechar}</button></div>
+    <div class="modal-topo"><h2>${r ? 'Editar produto' : 'Novo produto'}</h2><button class="icone-btn" data-fechar aria-label="Fechar">${ICONE.fechar}</button></div>
     <form id="f-extra">
       <label class="campo"><span>Nome</span><input name="nome" value="${esc(r?.nome || '')}" placeholder="ex.: Envelopamento de frota"></label>
       <div class="campo" style="margin-top:12px"><span>Tipo de cobrança</span>
@@ -135,7 +136,7 @@ function formExtra(p, depois) {
         ${r ? `<button type="button" class="btn btn-perigo" id="x-excluir">Excluir</button>` : ''}
         <button class="btn btn-primario" type="submit">Salvar</button>
       </div>
-    </form>`);
+    </form>`, { fechar: () => { if (!salvouReg) aoCancelar?.(); } });
 
   const mostrarTipo = () => {
     caixa.querySelectorAll('[data-tipo]').forEach(b => b.setAttribute('aria-pressed', b.dataset.tipo === tipo));
@@ -177,7 +178,7 @@ function formExtra(p, depois) {
     const reg = { ...(r ? { id: r.id } : {}), nome, tipo, opcoes: tipo === 'opcoes' ? opcoes : [], preco: tipo === 'opcoes' ? 0 : preco,
       m2_livre: 0, minimo, minimo_por: f.minimo_por.value, acabamentos,
       prazo_dias: Math.max(0, parseInt(f.prazo_dias.value, 10) || 0), ativo: f.ativo.checked };
-    try { await salvar('produtos', reg); fecharModal(); avisar('Produto salvo'); depois(); }
+    try { const s = await salvar('produtos', reg); salvouReg = { ...reg, ...s }; fecharModal(); avisar('Produto salvo'); depois(salvouReg); }
     catch (err) { avisar(err.message, 'erro'); }
   });
 }

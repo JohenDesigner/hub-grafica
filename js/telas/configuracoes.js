@@ -155,7 +155,7 @@ export async function montarMais(el) {
     ${item('#balcao', 'Balcão', 'Impressões e cópias rápidas, sem cliente')}
     ${item('#desempenho', 'Desempenho', 'Gráficos de vendas, pedidos, clientes e WhatsApp')}
     ${item('#receber', 'A receber', 'Quem deve e quanto, registrar pagamento')}
-    ${item('#produtos', 'Produtos e preços', 'Catálogo do site e produtos extras do hub')}
+    ${item('#produtos', 'Produtos e preços', 'Catálogo do site e criar produto novo')}
     ${item('#pedidos/lixeira', 'Lixeira', 'Pedidos excluídos nos últimos 30 dias')}
     ${item('#configuracoes', 'Configurações', 'Dados da gráfica, mensagens, backup, sair')}
   </ul>`;
