@@ -14,8 +14,30 @@ export const PADRAO_CFG = {
   pix: '65.480.613/0001-19',
   logo: '',
   validade_dias: 7,
-  textos: {}
+  textos: {},
+  respostas: null   // respostas prontas das Conversas (null = usa as padrão)
 };
+
+// Respostas prontas da tela de Conversas. Marcadores: {cliente} {pix} {endereco} {horario} {grafica}
+export const RESPOSTAS_PADRAO = [
+  { titulo: 'Recebi', texto: 'Oi, {cliente}! Recebi sim, já estou vendo aqui e te mando o orçamento em instantes. 😊' },
+  { titulo: 'Mandar a arte', texto: 'Pode me mandar a arte aqui mesmo (PDF, PNG ou CorelDRAW). Se não tiver arte, a gente cria pra você! 🎨' },
+  { titulo: 'Sinal', texto: 'Pra começar a produção, trabalhamos com 50% de sinal e o restante na retirada. Pode ser?' },
+  { titulo: 'Pix', texto: 'Segue a chave Pix (CNPJ): {pix}\n{grafica}\n\nDepois me manda o comprovante aqui, por favor! 🙏' },
+  { titulo: 'Prazo', texto: 'O prazo de produção começa a contar depois da arte aprovada e do sinal. Assim que ficar pronto eu te aviso por aqui!' },
+  { titulo: 'Arte pra aprovar', texto: '{cliente}, a arte está pronta! Confere com calma e me diz se posso mandar pra produção ou se quer mudar alguma coisa.' },
+  { titulo: 'Pronto', texto: '{cliente}, seu pedido está pronto! 🎉 Pode retirar na loja: {endereco}, {horario}.' },
+  { titulo: 'Endereço', texto: 'Estamos na {endereco}. 📍\nAtendimento: {horario}.' },
+  { titulo: 'Obrigado', texto: 'Obrigado pela preferência, {cliente}! 💛 Se puder, deixa uma avaliação pra gente no Google, ajuda muito: https://g.page/r/CWKTHinBP02gEAI/review' }
+];
+
+export async function salvarRespostas(lista) {
+  const cfg = await carregarCfg();
+  const u = await usuarioAtual();
+  const { respostas, ...resto } = cfg;
+  await salvar('configuracoes', { user_id: u.id, dados: { ...resto, respostas: lista } });
+  cache = { ...cfg, respostas: lista };
+}
 
 let cache = null;
 export async function carregarCfg() {
@@ -93,13 +115,14 @@ export async function montar(el) {
       const v = e.target[`texto_${k}`].value;
       if (v.trim() && v.trim() !== PADRAO[k].trim()) textos[k] = v;
     }
-    const dados = { nome: d.nome, cnpj: d.cnpj, whatsapp: d.whatsapp, endereco: d.endereco, instagram: d.instagram,
+    const anterior = await carregarCfg();
+    const dados = { ...(anterior.respostas ? { respostas: anterior.respostas } : {}), nome: d.nome, cnpj: d.cnpj, whatsapp: d.whatsapp, endereco: d.endereco, instagram: d.instagram,
       pix: d.pix, horario: d.horario, validade_dias: Math.max(1, parseInt(d.validade_dias, 10) || 7), logo, textos };
     const btn = e.target.querySelector('[type=submit]'); btn.disabled = true;
     try {
       const u = await usuarioAtual();
       await salvar('configuracoes', { user_id: u.id, dados });
-      cache = { ...PADRAO_CFG, ...dados };
+      cache = { ...PADRAO_CFG, ...dados, textos: { ...dados.textos } };
       avisar('Configurações salvas');
     } catch (err) { avisar(err.message, 'erro'); }
     btn.disabled = false;

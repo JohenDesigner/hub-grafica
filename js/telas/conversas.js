@@ -2,7 +2,8 @@
 import { db, listar, obter } from '../db.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config.js';
 import { NOMES_ETAPA } from '../calc.js';
-import { esc, avisar, titulo, ICONE } from '../ui.js';
+import { esc, avisar, titulo, ICONE, abrirModal, fecharModal, confirmar } from '../ui.js';
+import { carregarCfg, salvarRespostas, RESPOSTAS_PADRAO } from './configuracoes.js';
 
 const JANELA_MS = 24 * 3600e3;
 
@@ -27,6 +28,44 @@ const resumo = m => (m.direcao === 'enviada' ? (m.tipo === 'auto' ? 'Resposta au
   String(m.texto || (m.tipo === 'text' ? '' : `(${m.tipo})`)).replace(/\*([^*\n]+)\*/g, '$1').replace(/\s+/g, ' ');
 const iniciais = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
 const avatar = n => `<span aria-hidden="true" class="conv-avatar">${esc(iniciais(n))}</span>`;
+const preencher = (t, v) => t.replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m));
+
+// Editor das respostas prontas (título curto + texto)
+function editarRespostas(lista, aoSalvar) {
+  let itens = lista.map(r => ({ ...r }));
+  const caixa = abrirModal('<div id="rp"></div>');
+  const area = caixa.querySelector('#rp');
+  const desenhar = () => {
+    area.innerHTML = `
+      <div class="modal-topo"><h2>Respostas prontas</h2><button class="icone-btn" data-fechar-rp aria-label="Fechar">${ICONE.fechar}</button></div>
+      <p class="sub">Marcadores que viram dado de verdade: {cliente} {pix} {endereco} {horario} {grafica}</p>
+      ${itens.map((r, i) => `<div class="cartao rp-item">
+        <div class="campo-linha"><label class="campo"><span>Nome do botão</span><input data-i="${i}" data-c="titulo" value="${esc(r.titulo)}" maxlength="24"></label>
+        <button class="icone-btn" type="button" data-rem="${i}" aria-label="Apagar resposta">${ICONE.lixo}</button></div>
+        <label class="campo"><span>Texto</span><textarea data-i="${i}" data-c="texto" rows="3">${esc(r.texto)}</textarea></label></div>`).join('')}
+      <div class="botoes"><button class="btn" type="button" id="rp-nova">${ICONE.mais.replace('<svg', '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"')}Nova resposta</button>
+      <button class="btn" type="button" id="rp-padrao">Voltar ao padrão</button></div>
+      <button class="btn btn-primario btn-bloco rodape-fixo" type="button" id="rp-salvar">Salvar respostas</button>`;
+    area.querySelector('[data-fechar-rp]').addEventListener('click', () => fecharModal());
+    area.querySelectorAll('[data-c]').forEach(c => c.addEventListener('input', () => { itens[c.dataset.i][c.dataset.c] = c.value; }));
+    area.querySelectorAll('[data-rem]').forEach(b => b.addEventListener('click', () => { itens.splice(+b.dataset.rem, 1); desenhar(); }));
+    area.querySelector('#rp-nova').addEventListener('click', () => { itens.push({ titulo: '', texto: '' }); desenhar(); area.querySelector('.rp-item:last-of-type input')?.focus(); });
+    area.querySelector('#rp-padrao').addEventListener('click', async () => {
+      fecharModal();
+      if (await confirmar('Trocar suas respostas pelas respostas padrão?', { ok: 'Trocar' })) { itens = RESPOSTAS_PADRAO.map(r => ({ ...r })); }
+      editarRespostasReabrir();
+    });
+    area.querySelector('#rp-salvar').addEventListener('click', async e => {
+      const limpas = itens.map(r => ({ titulo: r.titulo.trim(), texto: r.texto.trim() })).filter(r => r.titulo && r.texto);
+      e.target.disabled = true;
+      try { await salvarRespostas(limpas); fecharModal(); avisar('Respostas salvas'); aoSalvar(limpas); }
+      catch (err) { avisar(err.message, 'erro'); e.target.disabled = false; }
+    });
+  };
+  const editarRespostasReabrir = () => editarRespostas(itens, aoSalvar);
+  desenhar();
+}
+
 const ICONE_ENVIAR = '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg>';
 
 // ---------- não lidas (selo no menu) ----------
@@ -134,6 +173,7 @@ export async function montarConversa(el, clienteId, vivo) {
     <div id="cv-ficha"></div>
     <div id="cv-msgs" class="conv-msgs" aria-live="polite"><p class="vazio">Carregando…</p></div>
     <p id="cv-janela" class="aviso" hidden></p>
+    <div class="conv-rapidas" id="cv-rapidas" aria-label="Respostas prontas"></div>
     <form id="cv-form" class="conv-form">
       <label class="sr" for="cv-texto">Mensagem</label>
       <textarea id="cv-texto" rows="1" placeholder="Escreva sua resposta…" autocomplete="off"></textarea>
@@ -142,6 +182,26 @@ export async function montarConversa(el, clienteId, vivo) {
 
   const caixa = el.querySelector('#cv-msgs');
   const campo = el.querySelector('#cv-texto');
+  const cfg = await carregarCfg();
+  if (!vivo()) return;
+  let respostas = Array.isArray(cfg.respostas) ? cfg.respostas : RESPOSTAS_PADRAO;
+  const valores = () => ({ cliente: (cliente.nome || '').split(' ')[0], pix: cfg.pix || '', endereco: cfg.endereco || '', horario: cfg.horario || '', grafica: cfg.nome || 'Johen Arte Grafica' });
+
+  function desenharRapidas() {
+    el.querySelector('#cv-rapidas').innerHTML = respostas.map((r, i) => `<button type="button" class="conv-rapida" data-r="${i}">${esc(r.titulo)}</button>`).join('') +
+      `<button type="button" class="conv-rapida conv-rapida-editar" data-editar aria-label="Editar respostas prontas">${ICONE.editar.replace('<svg', '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"')}Editar</button>`;
+  }
+  el.querySelector('#cv-rapidas').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.hasAttribute('data-editar')) { editarRespostas(respostas, l => { respostas = l; desenharRapidas(); }); return; }
+    const r = respostas[+b.dataset.r]; if (!r) return;
+    const t = preencher(r.texto, valores());
+    campo.value = campo.value.trim() ? campo.value.trimEnd() + '\n' + t : t;
+    campo.dispatchEvent(new Event('input'));
+    campo.focus();
+    campo.setSelectionRange(campo.value.length, campo.value.length);
+  });
+  desenharRapidas();
 
   async function desenharFicha() {
     const fichas = await listar('fichas', { eq: { cliente_id: clienteId }, semExcluidos: true, order: 'criado_em', desc: true });

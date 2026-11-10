@@ -237,6 +237,21 @@ try {
   ok(enviado?.cliente_id === cliWa && enviado.texto.includes('R$ 120,00'), 'resposta enviada pela função do WhatsApp');
   ok((await pg.inputValue('#cv-texto')) === '', 'campo limpo depois de enviar');
   await print('16-conversa');
+  ok(await pg.locator('.conv-rapida[data-r]').count() === 9, 'respostas prontas aparecem');
+  await pg.locator('.conv-rapida', { hasText: 'Pix' }).click();
+  ok((await pg.inputValue('#cv-texto')).includes('65.480.613/0001-19'), 'resposta pronta preenche o Pix');
+  await pg.fill('#cv-texto', '');
+  await pg.locator('.conv-rapida', { hasText: 'Pronto' }).click();
+  ok((await pg.inputValue('#cv-texto')).startsWith('Carla, seu pedido está pronto'), 'resposta pronta usa o nome do cliente');
+  await pg.fill('#cv-texto', '');
+  await pg.click('[data-editar]'); await pg.waitForSelector('#rp-salvar');
+  await pg.click('#rp-nova');
+  await pg.locator('.rp-item').last().locator('input').fill('Frete');
+  await pg.locator('.rp-item').last().locator('textarea').fill('Entregamos por motoboy, {cliente}.');
+  await print('17-respostas-prontas');
+  await pg.click('#rp-salvar'); await esperar(400);
+  ok(await pg.locator('.conv-rapida[data-r]').count() === 10, 'nova resposta pronta salva');
+  ok(await pg.evaluate(() => window.__mock.banco().t.configuracoes[0]?.dados?.respostas?.length === 10 && window.__mock.banco().t.configuracoes[0].dados.horario === 'seg a sáb, 11h–20h'), 'salvar respostas mantém as configurações');
   await pg.click('#cv-ficha .btn-primario'); await pg.waitForSelector('#o-cliente');
   ok((await texto('#o-cliente')).includes('Carla do Zap'), 'atalho abre o orçamento com o cliente');
 
