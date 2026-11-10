@@ -73,7 +73,7 @@ try {
   await pg.goto(BASE + '#clientes'); await pg.waitForSelector('#c-novo');
   await pg.click('#c-novo');
   await pg.fill('#f-cli [name=nome]', 'Ana Souza'); await pg.fill('#f-cli [name=whatsapp]', '(11) 98888-7777');
-  await pg.click('#f-cli [type=submit]'); await pg.waitForURL(/#cliente\//);
+  await pg.click('#f-cli [type=submit]'); await pg.waitForURL(/#cliente\//); await pg.waitForSelector('main .resumo');
   ok((await texto('main')).includes('Ana Souza'), 'cliente criado e detalhe aberto');
   await print('04-cliente');
 
