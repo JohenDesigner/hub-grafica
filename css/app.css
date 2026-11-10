@@ -369,3 +369,4 @@ body.com-painel{overflow:hidden}
 .be-alca{flex:none;width:36px;height:48px;border:0;background:none;color:var(--texto-2);font-size:22px;line-height:1;cursor:grab;touch-action:none;border-radius:10px}
 .be-alca:active{cursor:grabbing;background:var(--t-turquesa)}
 .be-alca:focus-visible{outline:2px solid var(--turquesa-esc)}
+.segmentado-quebra{flex-wrap:wrap}.segmentado-quebra button{flex:1 1 40%}

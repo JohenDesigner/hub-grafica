@@ -327,7 +327,7 @@ try {
   await pg.goto(BASE + '#orcamento'); await pg.waitForSelector('#o-add');
   await pg.click('#o-add'); await pg.waitForSelector('#ei-criar');
   await pg.click('#ei-criar'); await pg.waitForSelector('#f-extra');
-  await pg.fill('#f-extra [name=nome]', 'Placa de PVC 3mm'); await pg.fill('#f-extra [name=preco]', '45');
+  await pg.fill('#f-extra [name=nome]', 'Placa de PVC 3mm'); await pg.click('[data-tipo=unidade]'); await pg.fill('#f-extra [name=preco]', '45');
   await pg.click('#f-extra [type=submit]');
   await pg.waitForFunction(() => document.querySelector('#modal .modal-topo h2')?.textContent.includes('Placa de PVC'));
   ok(true, 'depois de criar, já abre o item com o produto novo');
@@ -340,6 +340,30 @@ try {
   await pg.click('#f-extra ~ * [data-fechar], #modal .modal-topo [data-fechar]');
   await pg.waitForSelector('#ei-criar');
   ok(true, 'cancelar o cadastro volta para a lista de produtos');
+  await pg.click('#modal [data-fechar]');
+
+  console.log('Produto por quantidade e valor');
+  await pg.goto(BASE + '#produtos'); await pg.waitForSelector('#p-novo');
+  await pg.click('#p-novo'); await pg.waitForSelector('#x-qtd:not([hidden])');
+  ok(await pg.locator('[data-linha=qtd]').count() === 3, 'já vem com 100, 500 e 1000');
+  await pg.fill('#f-extra [name=nome]', 'Adesivo redondo 5cm');
+  const linhas = pg.locator('[data-linha=qtd]');
+  await linhas.nth(0).locator('[data-k=preco]').fill('35'); await linhas.nth(1).locator('[data-k=preco]').fill('120');
+  await linhas.nth(2).locator('[data-k=qtd]').fill(''); await linhas.nth(2).locator('[data-k=preco]').fill('200');
+  await pg.click('#x-mais-qtd'); await linhas.nth(3).locator('[data-k=qtd]').fill('250'); await linhas.nth(3).locator('[data-k=preco]').fill('70');
+  await pg.click('#f-extra [type=submit]');
+  await esperar(200);
+  ok(await pg.isVisible('#f-extra'), 'linha com valor e sem quantidade dá erro');
+  await linhas.nth(2).locator('[data-k=preco]').fill('');
+  await pg.click('#f-extra [type=submit]'); await esperar(400);
+  const salvo = await pg.evaluate(() => window.__mock.banco().t.produtos.find(p => p.nome === 'Adesivo redondo 5cm'));
+  ok(salvo?.tipo === 'opcoes' && salvo.opcoes.map(o => o.label).join(',') === '100 un.,250 un.,500 un.', 'salva em ordem como 100 un., 250 un., 500 un.');
+  await pg.fill('#p-busca', 'Adesivo redondo');
+  ok((await texto('#p-lista')).includes('Quantidade e valor') && (await texto('#p-lista')).includes('35,00'), 'lista mostra tipo e a partir de');
+  await pg.goto(BASE + '#orcamento'); await pg.waitForSelector('#o-add'); await pg.click('#o-add');
+  await pg.fill('#ei-busca', 'adesivo redondo'); await pg.click('#ei-lista [data-p]');
+  ok((await texto('#ei-opcoes')).includes('250 un.') && (await texto('#ei-opcoes')).includes('70,00'), 'no orçamento escolhe a quantidade como no cartão');
+  await print('22-produto-quantidade');
   await pg.click('#modal [data-fechar]');
 
   console.log('Zerar resumo');
