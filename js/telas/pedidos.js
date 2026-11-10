@@ -1,5 +1,5 @@
 // Pedidos: lista por etapa e detalhe da ficha.
-import { listar, obter, atualizar, excluir, restaurar, ConflitoError } from '../db.js';
+import { db, listar, obter, atualizar, excluir, restaurar, ConflitoError } from '../db.js';
 import { ETAPAS, NOMES_ETAPA, saldoAberto, calcularFicha, calcularItem, orcamentoVencido } from '../calc.js';
 import { moeda, data, soDigitos, hojeISO } from '../formato.js';
 import { mensagem, linkWa, detalheItem } from '../whatsapp.js';
@@ -127,6 +127,7 @@ export async function montarDetalhe(el, id, vivo) {
       <div class="cabeca"><h3 style="flex:1">Pagamentos</h3>${falta === 0 && ficha.total_centavos > 0 ? '<span class="selo ok">Quitado</span>' : ''}</div>
       ${pags.length ? pags.map(p => `<div class="linha-item"><div class="meio"><b>${moeda(p.valor_centavos)}</b> <span class="sub">${p.tipo === 'sinal' ? 'sinal' : 'pagamento'} · ${NOMES_FORMA[p.forma]} · ${data(p.pago_em)}</span></div>
         ${excluido ? '' : `<button class="icone-btn" data-excluir-pag="${p.id}" aria-label="Excluir pagamento">${ICONE.lixo}</button>`}</div>`).join('') : '<p class="sub">Nenhum pagamento ainda.</p>'}
+      <div id="pd-comprovantes"></div>
       <div class="resumo"><span>Pago</span><span class="valor">${moeda(pago)}</span><span><b>Falta receber</b></span><span class="valor" style="color:${falta ? 'var(--alerta)' : 'var(--ok)'}">${moeda(falta)}</span></div>
       ${falta > 0 && !excluido && !cancelado ? '<button class="btn btn-bloco btn-primario" id="pd-pagar">Registrar pagamento</button>' : ''}
     </section>
@@ -173,6 +174,7 @@ export async function montarDetalhe(el, id, vivo) {
     if (link && !/^https?:\/\//i.test(link)) { avisar('O link precisa começar com https://', 'erro'); return; }
     if (await mudar({ prazo: f.prazo.value || null, os_fpq: f.os_fpq.value.trim(), link_arte: link, observacoes: f.observacoes.value })) { avisar('Detalhes salvos'); recarregar(); }
   });
+  mostrarComprovantes(el.querySelector('#pd-comprovantes'), ficha.id, vivo);
   el.querySelector('#pd-pagar')?.addEventListener('click', async () => { if (await registrarPagamento(ficha)) recarregar(); });
   el.querySelectorAll('[data-excluir-pag]').forEach(b => b.addEventListener('click', async () => {
     if (!await confirmar('Excluir este pagamento? Use só se foi lançado errado.', { ok: 'Excluir', perigo: true })) return;
@@ -193,4 +195,23 @@ export async function montarDetalhe(el, id, vivo) {
     try { await restaurar(id); avisar('Pedido restaurado'); recarregar(); }
     catch (err) { avisar(err.message, 'erro'); }
   });
+}
+
+// Comprovantes que o cliente enviou pela página do pedido no site (Supabase Storage, pasta = id da ficha).
+async function mostrarComprovantes(alvo, fichaId, vivo) {
+  if (!alvo || !db.storage) return;
+  try {
+    const { data: arqs } = await db.storage.from('comprovantes').list(fichaId, { sortBy: { column: 'created_at', order: 'desc' } });
+    const lista = (arqs || []).filter(a => a.name && !a.name.startsWith('.'));
+    if (!lista.length || !vivo()) return;
+    const { data: urls } = await db.storage.from('comprovantes').createSignedUrls(lista.map(a => `${fichaId}/${a.name}`), 3600);
+    if (!vivo()) return;
+    alvo.innerHTML = `<div class="comprovantes"><b>Comprovante enviado pelo cliente</b><div class="comp-lista">${lista.map((a, i) => {
+      const u = urls?.[i]?.signedUrl; if (!u) return '';
+      const quando = a.created_at ? new Date(a.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+      return /\.pdf$/i.test(a.name)
+        ? `<a class="comp-item comp-pdf" href="${esc(u)}" target="_blank" rel="noopener"><span>PDF</span><small>${esc(quando)}</small></a>`
+        : `<a class="comp-item" href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="Comprovante enviado em ${esc(quando)}" loading="lazy"><small>${esc(quando)}</small></a>`;
+    }).join('')}</div><p class="sub">Confira no app do banco antes de registrar o pagamento.</p></div>`;
+  } catch {}
 }

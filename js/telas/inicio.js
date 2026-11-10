@@ -89,8 +89,12 @@ export async function montar(el, _p, vivo) {
   const prontosParados = pedidos.filter(f => f.etapa === 'pronto' && Date.now() - Date.parse(f.etapa_em || f.criado_em) > 3 * DIA);
   const orcParados = orcamentos.filter(f => f.total_centavos > 0 && Date.now() - Date.parse(f.atualizado_em || f.criado_em) > 2 * DIA);
   const orcSemValor = orcamentos.filter(f => !f.total_centavos);
+  const doSite = orcamentos.filter(f => /^\[Site /.test(f.observacoes || ''));
+  const comComprovante = fichas.filter(f => /enviou comprovante/i.test(f.observacoes || '') && f.etapa !== 'cancelado' && saldo(f) > 0);
   const alertas = [
     naoLidas && ['wpp', `${naoLidas} ${naoLidas === 1 ? 'mensagem não lida' : 'mensagens não lidas'} no WhatsApp`, '#conversas'],
+    doSite.length && ['wpp', `${doSite.length} ${doSite.length === 1 ? 'pedido novo do site' : 'pedidos novos do site'} para conferir`, doSite.length === 1 ? `#pedido/${doSite[0].id}` : '#pedidos/orcamento'],
+    comComprovante.length && ['alerta', `${comComprovante.length} ${comComprovante.length === 1 ? 'comprovante de pagamento' : 'comprovantes de pagamento'} para conferir`, comComprovante.length === 1 ? `#pedido/${comComprovante[0].id}` : '#receber'],
     atrasados.length && ['erro', `${atrasados.length} ${atrasados.length === 1 ? 'pedido atrasado' : 'pedidos atrasados'}`, atrasados.length === 1 ? `#pedido/${atrasados[0].id}` : '#pedidos'],
     orcSemValor.length && ['alerta', `${orcSemValor.length} ${orcSemValor.length === 1 ? 'orçamento esperando' : 'orçamentos esperando'} você montar`, orcSemValor.length === 1 ? `#orcamento/${orcSemValor[0].id}` : '#pedidos/orcamento'],
     prontosParados.length && ['alerta', `${prontosParados.length} ${prontosParados.length === 1 ? 'pedido pronto' : 'pedidos prontos'} há mais de 3 dias sem retirada`, '#pedidos/pronto'],

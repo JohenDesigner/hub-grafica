@@ -298,3 +298,10 @@ svg{display:block}
 .graf-dica b{display:block}
 .conv-rapida-ia{background:var(--texto);color:var(--fundo);border-color:var(--texto)}
 .check.cartao{align-items:flex-start;line-height:1.35}
+/* comprovantes enviados pelo site */
+.comprovantes{margin-top:12px;padding:12px;border-radius:var(--raio-p);background:var(--t-ok);display:flex;flex-direction:column;gap:8px}
+.comp-lista{display:flex;gap:8px;flex-wrap:wrap}
+.comp-item{display:flex;flex-direction:column;gap:4px;align-items:center;text-decoration:none;color:var(--texto-2);font-size:12px}
+.comp-item img{width:88px;height:88px;object-fit:cover;border-radius:10px;border:1px solid var(--linha);background:var(--cartao)}
+.comp-pdf span{width:88px;height:88px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--linha);background:var(--cartao);font-weight:700;color:var(--erro)}
+.comprovantes .sub{margin:0}
