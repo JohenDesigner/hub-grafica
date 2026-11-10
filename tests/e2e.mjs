@@ -237,6 +237,11 @@ try {
   ok(enviado?.cliente_id === cliWa && enviado.texto.includes('R$ 120,00'), 'resposta enviada pela função do WhatsApp');
   ok((await pg.inputValue('#cv-texto')) === '', 'campo limpo depois de enviar');
   await print('16-conversa');
+  await pg.route('**/functions/v1/whatsapp-ia', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, texto: 'Claro, Carla! Você já tem a arte pronta?' }) }));
+  await pg.click('[data-ia]'); await pg.waitForFunction(() => document.querySelector('#cv-texto').value.includes('arte pronta'));
+  ok(true, 'IA sugere a resposta no campo, sem enviar');
+  ok(await pg.locator('.conv-bolha.conv-eu').count() === 2, 'sugestão da IA não é enviada sozinha');
+  await pg.fill('#cv-texto', '');
   ok(await pg.locator('.conv-rapida[data-r]').count() === 9, 'respostas prontas aparecem');
   await pg.locator('.conv-rapida', { hasText: 'Pix' }).click();
   ok((await pg.inputValue('#cv-texto')).includes('65.480.613/0001-19'), 'resposta pronta preenche o Pix');
@@ -255,9 +260,23 @@ try {
   await pg.click('#cv-ficha .btn-primario'); await pg.waitForSelector('#o-cliente');
   ok((await texto('#o-cliente')).includes('Carla do Zap'), 'atalho abre o orçamento com o cliente');
 
+  console.log('IA e desempenho');
+  await pg.goto(BASE + '#conversas'); await pg.waitForSelector('#cv-ia');
+  await esperar(300);
+  ok(await pg.isChecked('#cv-ia'), 'IA fora do horário vem ligada');
+  await pg.click('#cv-ia'); await esperar(400);
+  ok(await pg.evaluate(() => { const d = window.__mock.banco().t.configuracoes[0].dados; return d.ia_auto === false && d.respostas.length === 10 && d.horario === 'seg a sáb, 11h–20h'; }), 'desligar a IA salva sem perder configurações');
+  await pg.click('#cv-ia'); await esperar(400);
+  await pg.goto(BASE + '#desempenho'); await pg.waitForSelector('.gr');
+  ok(await pg.locator('.gr').count() >= 4, 'gráficos de desempenho desenhados');
+  ok(await pg.locator('.gr-legenda').count() === 1, 'gráfico de 2 séries tem legenda');
+  await pg.locator('.gr').first().locator('.graf-col').last().click();
+  ok((await texto('.gr .graf-dica')).includes('Vendido'), 'tocar na coluna mostra os valores');
+  await print('18-desempenho');
+
   console.log('PC (1280 px)');
   await pg.setViewportSize({ width: 1280, height: 800 });
-  for (const t of ['inicio', 'pedidos', 'orcamento', 'clientes', 'receber', 'produtos', 'conversas', 'conversa/' + cliWa]) {
+  for (const t of ['inicio', 'pedidos', 'orcamento', 'clientes', 'receber', 'produtos', 'conversas', 'conversa/' + cliWa, 'desempenho']) {
     await pg.goto(BASE + '#' + t); await esperar(500); await print(`pc-${t}`);
   }
   ok(await pg.evaluate(() => getComputedStyle(document.getElementById('nav')).width === '220px'), 'no PC a navegação vira lateral');

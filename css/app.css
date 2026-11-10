@@ -288,3 +288,13 @@ svg{display:block}
   .alerta-item{flex:1 1 280px}
 }
 #painel > * + *{margin-top:16px}
+/* gráficos de desempenho (2 séries validadas para daltonismo, claro e escuro) */
+.gr-barra.gr-a,.gr-legenda i.gr-a{fill:#0097a1;background:#0097a1}
+.gr-barra.gr-b,.gr-legenda i.gr-b{fill:#E8650A;background:#E8650A}
+.gr .graf-col.foco .gr-barra{filter:brightness(.82)}
+.gr-legenda{display:flex;gap:16px;font-size:13px;color:var(--texto-2)}
+.gr-legenda span{display:inline-flex;align-items:center;gap:6px}
+.gr-legenda i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.graf-dica b{display:block}
+.conv-rapida-ia{background:var(--texto);color:var(--fundo);border-color:var(--texto)}
+.check.cartao{align-items:flex-start;line-height:1.35}

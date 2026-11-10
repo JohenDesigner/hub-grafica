@@ -108,6 +108,7 @@ export async function montar(el, _p, vivo) {
     ${alertas.length ? `<section class="alertas" aria-label="Precisa de atenção">${alertas.map(([tipo, txt, href]) => `<a class="alerta-item ${tipo}" href="${href}"><span class="alerta-ponto" aria-hidden="true"></span><span>${esc(txt)}</span><span class="alerta-seta" aria-hidden="true">›</span></a>`).join('')}</section>` : ''}
     <div class="cabeca"><h2>Resumo</h2><div class="segmentado painel-periodo" role="group" aria-label="Período">${PERIODOS.map(([k, n]) => `<button type="button" data-per="${k}" aria-pressed="${k === periodo}">${n}</button>`).join('')}</div></div>
     <div id="painel"></div>
+    <a class="btn btn-bloco" href="#desempenho">Ver gráficos de desempenho</a>
     <section class="cartao">
       <h3>Prazos de hoje e amanhã</h3>
       ${prazos.length ? `<ul class="lista">${prazos.map(f => `<li><a class="lista-item" href="#pedido/${f.id}">

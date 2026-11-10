@@ -3,7 +3,7 @@ import { db, listar, obter } from '../db.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config.js';
 import { NOMES_ETAPA } from '../calc.js';
 import { esc, avisar, titulo, ICONE, abrirModal, fecharModal, confirmar } from '../ui.js';
-import { carregarCfg, salvarRespostas, RESPOSTAS_PADRAO } from './configuracoes.js';
+import { carregarCfg, salvarRespostas, salvarCampoCfg, RESPOSTAS_PADRAO } from './configuracoes.js';
 
 const JANELA_MS = 24 * 3600e3;
 
@@ -24,7 +24,7 @@ const diaTitulo = iso => {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: d.getFullYear() === hoje.getFullYear() ? undefined : 'numeric' });
 };
 const formatar = t => esc(t).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-const resumo = m => (m.direcao === 'enviada' ? (m.tipo === 'auto' ? 'Resposta automática: ' : 'Você: ') : '') +
+const resumo = m => (m.direcao === 'enviada' ? (m.tipo === 'auto' ? 'Resposta automática: ' : m.tipo === 'ia' ? 'IA: ' : 'Você: ') : '') +
   String(m.texto || (m.tipo === 'text' ? '' : `(${m.tipo})`)).replace(/\*([^*\n]+)\*/g, '$1').replace(/\s+/g, ' ');
 const iniciais = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
 const avatar = n => `<span aria-hidden="true" class="conv-avatar">${esc(iniciais(n))}</span>`;
@@ -146,9 +146,16 @@ export async function montarLista(el, _p, vivo) {
   el.innerHTML = `
     <div class="cabeca"><h2>Conversas</h2></div>
     <p class="sub">WhatsApp do hub: (11) 94173-7345. Toda mensagem nova vira orçamento automaticamente.</p>
+    <label class="check cartao" style="padding:10px 14px"><input type="checkbox" id="cv-ia"> <span><b>IA responde com a loja fechada</b><br><span class="sub">Fora do horário (11h–20h, seg. a sáb.) ela atende sozinha e anota o pedido. Nunca passa preço.</span></span></label>
     <label class="campo"><span>Buscar por nome</span><input id="cv-busca" type="search" autocomplete="off"></label>
     <div id="cv-lista" class="conv-lista"><p class="vazio">Carregando…</p></div>`;
   el.querySelector('#cv-busca').addEventListener('input', desenhar);
+  const chaveIA = el.querySelector('#cv-ia');
+  carregarCfg().then(cfg => { chaveIA.checked = cfg.ia_auto !== false; });
+  chaveIA.addEventListener('change', async () => {
+    try { await salvarCampoCfg('ia_auto', chaveIA.checked); avisar(chaveIA.checked ? 'IA ligada para quando a loja estiver fechada' : 'IA desligada'); }
+    catch (err) { chaveIA.checked = !chaveIA.checked; avisar(err.message, 'erro'); }
+  });
   const aoChegar = () => { if (vivo()) desenhar(); else removeEventListener('wa-mensagem', aoChegar); };
   addEventListener('wa-mensagem', aoChegar);
   await desenhar();
@@ -187,12 +194,27 @@ export async function montarConversa(el, clienteId, vivo) {
   let respostas = Array.isArray(cfg.respostas) ? cfg.respostas : RESPOSTAS_PADRAO;
   const valores = () => ({ cliente: (cliente.nome || '').split(' ')[0], pix: cfg.pix || '', endereco: cfg.endereco || '', horario: cfg.horario || '', grafica: cfg.nome || 'Johen Arte Grafica' });
 
+  async function sugerirIA(b) {
+    b.disabled = true; const antes = b.textContent; b.textContent = '✨ Pensando…';
+    try {
+      const { data } = await db.auth.getSession();
+      const r = await fetch(`${SUPABASE_URL}/functions/v1/whatsapp-ia`, { method: 'POST',
+        headers: { Authorization: `Bearer ${data.session?.access_token}`, apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cliente_id: clienteId }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.texto) throw new Error(d.mensagem || 'A IA não conseguiu responder agora.');
+      campo.value = d.texto; campo.dispatchEvent(new Event('input')); campo.focus();
+    } catch (err) { avisar(/fetch/i.test(err.message) ? 'Sem internet para usar a IA.' : err.message, 'erro'); }
+    finally { b.disabled = false; b.textContent = antes; }
+  }
+
   function desenharRapidas() {
-    el.querySelector('#cv-rapidas').innerHTML = respostas.map((r, i) => `<button type="button" class="conv-rapida" data-r="${i}">${esc(r.titulo)}</button>`).join('') +
+    el.querySelector('#cv-rapidas').innerHTML = '<button type="button" class="conv-rapida conv-rapida-ia" data-ia>✨ Sugerir com IA</button>' + respostas.map((r, i) => `<button type="button" class="conv-rapida" data-r="${i}">${esc(r.titulo)}</button>`).join('') +
       `<button type="button" class="conv-rapida conv-rapida-editar" data-editar aria-label="Editar respostas prontas">${ICONE.editar.replace('<svg', '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"')}Editar</button>`;
   }
   el.querySelector('#cv-rapidas').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
+    if (b.hasAttribute('data-ia')) { sugerirIA(b); return; }
     if (b.hasAttribute('data-editar')) { editarRespostas(respostas, l => { respostas = l; desenharRapidas(); }); return; }
     const r = respostas[+b.dataset.r]; if (!r) return;
     const t = preencher(r.texto, valores());
@@ -223,7 +245,8 @@ export async function montarConversa(el, clienteId, vivo) {
       const conteudo = m.texto ? formatar(m.texto) : `<i>(${esc(m.tipo)} — abra no celular do cliente ou peça para reenviar como texto)</i>`;
       return `${sep}<div class="conv-bolha ${lado}${m._enviando ? ' conv-enviando' : ''}">
         ${m.tipo === 'auto' ? '<span class="conv-rotulo">Resposta automática</span>' : ''}
-        ${m.tipo !== 'text' && m.tipo !== 'auto' && m.texto ? `<span class="conv-rotulo">${esc(m.tipo)}</span>` : ''}
+        ${m.tipo === 'ia' ? '<span class="conv-rotulo">Resposta da IA</span>' : ''}
+        ${!['text', 'auto', 'ia'].includes(m.tipo) && m.texto ? `<span class="conv-rotulo">${esc(m.tipo)}</span>` : ''}
         <div>${conteudo}</div><span class="conv-hora">${esc(new Date(m.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))} ${status}</span></div>`;
     }).join('') : '<p class="vazio">Nenhuma mensagem ainda.</p>';
     caixa.scrollTop = caixa.scrollHeight;
