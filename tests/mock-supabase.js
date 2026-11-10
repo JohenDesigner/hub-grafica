@@ -5,8 +5,9 @@
   const USUARIO = { id: '11111111-1111-4111-8111-111111111111', email: 'teste@johen.com' };
   const SENHA = 'senha123';
   const carregar = () => { try { return JSON.parse(localStorage.getItem(CHAVE)); } catch { return null; } };
-  let banco = carregar() || { seq: 0, relogio: 0, sessao: null, t: { clientes: [], produtos: [], fichas: [], pagamentos: [], configuracoes: [], whatsapp_mensagens: [] } };
+  let banco = carregar() || { seq: 0, relogio: 0, sessao: null, t: { clientes: [], produtos: [], fichas: [], pagamentos: [], configuracoes: [], whatsapp_mensagens: [], vendas_balcao: [] } };
   banco.t.whatsapp_mensagens ||= [];
+  banco.t.vendas_balcao ||= [];
   const gravar = () => localStorage.setItem(CHAVE, JSON.stringify(banco));
   const agora = () => new Date(Date.now() + (++banco.relogio)).toISOString();
   window.__mock = { banco: () => banco, gravar, recarregar: () => { banco = carregar() || banco; } };
@@ -18,6 +19,7 @@
     fichas: () => ({ itens: [], desconto: { tipo: 'reais', valor: 0 }, total_centavos: 0, etapa: 'orcamento', prazo: null, os_fpq: '', link_arte: '', observacoes: '', excluido_em: null }),
     pagamentos: () => ({ tipo: 'pagamento', pago_em: new Date().toISOString().slice(0, 10) }),
     configuracoes: () => ({ dados: {} }),
+    vendas_balcao: () => ({ itens: [], subtotal_centavos: 0, vendido_em: new Date().toISOString().slice(0, 10) }),
     whatsapp_mensagens: () => ({ direcao: 'recebida', tipo: 'text', texto: '', nome_contato: '', status: '', lida: false })
   };
 

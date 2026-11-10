@@ -305,3 +305,29 @@ svg{display:block}
 .comp-item img{width:88px;height:88px;object-fit:cover;border-radius:10px;border:1px solid var(--linha);background:var(--cartao)}
 .comp-pdf span{width:88px;height:88px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--linha);background:var(--cartao);font-weight:700;color:var(--erro)}
 .comprovantes .sub{margin:0}
+/* balcão */
+.atalho.escuro{background:linear-gradient(135deg,#2b3236,#4a5359)}
+.atalhos .atalho.escuro{grid-column:1/-1;min-height:72px}
+@media (min-width:900px){.atalhos .atalho.escuro{grid-column:auto;min-height:96px}}
+.bal-grade{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.bal-btn{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:6px;min-height:88px;padding:14px;border-radius:var(--raio);border:2px solid var(--linha);background:var(--cartao);color:var(--texto);text-align:left;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.bal-btn:active{transform:scale(.97)}
+.bal-btn.tem{border-color:var(--turquesa-esc);background:var(--t-turquesa)}
+.bal-nome{font-weight:700;font-size:16px;line-height:1.25;padding-right:34px}
+.bal-preco{font-size:14px;color:var(--texto-2);font-variant-numeric:tabular-nums}
+.bal-qtd{position:absolute;top:8px;right:8px;min-width:30px;height:30px;padding:0 8px;border-radius:999px;background:var(--turquesa-esc);color:#fff;font-weight:700;display:grid;place-items:center;font-size:15px}
+.bal-caixa{display:flex;flex-direction:column;gap:10px;border-color:var(--turquesa-esc)}
+.bal-caixa > *{margin-top:0}
+.bal-linha{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;font-size:15px}
+.bal-l-nome{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bal-passo{display:flex;align-items:center;gap:2px}
+.bal-passo .icone-btn{font-size:20px;font-weight:700;width:40px;height:40px}
+.bal-q{width:48px;height:40px;text-align:center;border:1px solid var(--linha);border-radius:10px;background:var(--campo);font-size:16px;font-variant-numeric:tabular-nums}
+.bal-desc{color:var(--ok);grid-template-columns:1fr auto}
+.bal-total input{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.bal-total .link{background:none;border:0;color:var(--turquesa-esc);font-weight:600;text-decoration:underline;cursor:pointer;padding:0;font-size:13px}
+.bal-acoes{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.bal-acoes .btn{min-height:52px}
+.bal-venda .icone-btn{flex:none}
+@media (min-width:600px){.bal-grade{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:900px){.bal-grade{grid-template-columns:repeat(4,1fr)}}

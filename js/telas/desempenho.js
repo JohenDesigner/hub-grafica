@@ -17,9 +17,10 @@ const tile = (rotulo, valor, det) => `<div class="cartao kpi"><span class="sub">
 
 export async function montar(el, _p, vivo) {
   titulo('Desempenho');
-  const [fichas, pags, clientes, msgs] = await Promise.all([
+  const [fichas, pagsPedidos, clientes, msgs, balcao] = await Promise.all([
     listar('fichas', { semExcluidos: true }), listar('pagamentos'), listar('clientes'),
-    listar('whatsapp_mensagens', { order: 'criado_em' })]);
+    listar('whatsapp_mensagens', { order: 'criado_em' }), listar('vendas_balcao').catch(() => [])]);
+  const pags = [...pagsPedidos, ...balcao.map(v => ({ pago_em: v.vendido_em, valor_centavos: v.total_centavos }))];
   if (!vivo()) return;
   const hoje = hojeISO();
 
@@ -78,7 +79,7 @@ export async function montar(el, _p, vivo) {
       ${tile('Total de clientes', clientes.filter(c => !c.arquivado).length, `${mesAtual.novos} ${mesAtual.novos === 1 ? 'novo' : 'novos'} em ${mesAtual.rotulo}`)}
     </div>
     <section class="cartao"><h3>Vendido e recebido por mês</h3>
-      <p class="sub">Vendido = pedidos fechados no mês. Recebido = dinheiro que entrou.</p>
+      <p class="sub">Vendido = pedidos fechados no mês. Recebido = dinheiro que entrou (pedidos e balcão).</p>
       ${colunas(porMes.map(m => ({ rotulo: m.rotulo, dica: m.dica, valores: [m.vendido, m.recebido] })), { series: [{ nome: 'Vendido', cor: 'a' }, { nome: 'Recebido', cor: 'b' }], formato: moeda, aria: 'Vendido e recebido por mês' })}</section>
     <div class="painel-2">
       <section class="cartao"><h3>Pedidos fechados por mês</h3>

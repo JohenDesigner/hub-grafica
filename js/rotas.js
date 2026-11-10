@@ -1,6 +1,6 @@
 // Troca de tela pelo #hash da URL.
 const rotas = {};
-const SECAO = { desempenho: 'inicio', conversa: 'conversas', pedido: 'pedidos', cliente: 'clientes', receber: 'mais', produtos: 'mais', configuracoes: 'mais', lixeira: 'mais' };
+const SECAO = { balcao: 'inicio', desempenho: 'inicio', conversa: 'conversas', pedido: 'pedidos', cliente: 'clientes', receber: 'mais', produtos: 'mais', configuracoes: 'mais', lixeira: 'mais' };
 
 export function registrar(nome, def) { rotas[nome] = def; }
 export function ir(nome, params) { location.hash = params ? `${nome}/${params}` : nome; }

@@ -124,7 +124,8 @@ export async function montar(el) {
       if (v.trim() && v.trim() !== PADRAO[k].trim()) textos[k] = v;
     }
     const anterior = await carregarCfg();
-    const dados = { ...(anterior.respostas ? { respostas: anterior.respostas } : {}), ...(anterior.ia_auto === false ? { ia_auto: false } : {}), nome: d.nome, cnpj: d.cnpj, whatsapp: d.whatsapp, endereco: d.endereco, instagram: d.instagram,
+    const { respostas, ia_auto, balcao } = anterior;
+    const dados = { ...(respostas ? { respostas } : {}), ...(ia_auto === false ? { ia_auto } : {}), ...(balcao ? { balcao } : {}), nome: d.nome, cnpj: d.cnpj, whatsapp: d.whatsapp, endereco: d.endereco, instagram: d.instagram,
       pix: d.pix, horario: d.horario, validade_dias: Math.max(1, parseInt(d.validade_dias, 10) || 7), logo, textos };
     const btn = e.target.querySelector('[type=submit]'); btn.disabled = true;
     try {
@@ -151,6 +152,7 @@ export async function montarMais(el) {
   titulo('Mais');
   const item = (href, nome, det) => `<li><a class="lista-item" href="${href}"><span class="meio"><span class="nome">${nome}</span><span class="det">${det}</span></span>${ICONE.seta.replace('<svg', '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"')}</a></li>`;
   el.innerHTML = `<ul class="lista">
+    ${item('#balcao', 'Balcão', 'Impressões e cópias rápidas, sem cliente')}
     ${item('#desempenho', 'Desempenho', 'Gráficos de vendas, pedidos, clientes e WhatsApp')}
     ${item('#receber', 'A receber', 'Quem deve e quanto, registrar pagamento')}
     ${item('#produtos', 'Produtos e preços', 'Catálogo do site e produtos extras do hub')}

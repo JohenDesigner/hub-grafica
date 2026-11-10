@@ -260,6 +260,37 @@ try {
   await pg.click('#cv-ficha .btn-primario'); await pg.waitForSelector('#o-cliente');
   ok((await texto('#o-cliente')).includes('Carla do Zap'), 'atalho abre o orçamento com o cliente');
 
+  console.log('Balcão');
+  await pg.goto(BASE + '#inicio'); await pg.waitForSelector('.atalho.escuro');
+  await pg.click('.atalho.escuro'); await pg.waitForSelector('.bal-btn');
+  ok(await pg.locator('.bal-btn').count() === 8, 'balcão mostra os botões de serviço');
+  ok(await pg.locator('#b-caixa').isHidden(), 'caixa escondido sem itens');
+  const btnPB = pg.locator('.bal-btn').nth(0), btnCor = pg.locator('.bal-btn').nth(1);
+  for (let k = 0; k < 10; k++) await btnPB.click();
+  await btnCor.click(); await btnCor.click();
+  ok((await texto('.bal-btn >> nth=0')).includes('10'), 'contador no botão');
+  ok((await pg.textContent('#b-registrar')).includes('14,00'), 'total soma 10×1 + 2×2');
+  await pg.locator('[data-menos="1"]').click();
+  ok((await pg.textContent('#b-registrar')).includes('12,00'), 'menos tira um');
+  await pg.fill('#b-total', '10'); await pg.locator('#b-total').blur();
+  ok((await pg.textContent('#b-registrar')).includes('10,00') && (await texto('.bal-desc')).includes('2,00'), 'total editável vira desconto');
+  await pg.fill('#b-total', '50'); await pg.locator('#b-total').blur();
+  ok((await pg.textContent('#b-registrar')).includes('10,00'), 'não deixa total maior que o valor cheio');
+  await pg.click('[data-forma=dinheiro]');
+  await print('19-balcao');
+  await pg.click('#b-registrar'); await pg.waitForFunction(() => document.querySelector('#b-caixa').hidden);
+  await esperar(300);
+  const venda = await pg.evaluate(() => window.__mock.banco().t.vendas_balcao[0]);
+  ok(venda && venda.total_centavos === 1000 && venda.subtotal_centavos === 1200 && venda.forma === 'dinheiro' && venda.itens.length === 2, 'venda salva com desconto e forma');
+  ok((await texto('#b-hoje')).includes('10× Impressão P&B'), 'aparece em vendas de hoje');
+  await pg.click('#b-editar'); await pg.waitForSelector('#be-salvar');
+  await pg.locator('.be-item').first().locator('[data-c=preco]').fill('1,20');
+  await pg.click('#be-salvar'); await esperar(400);
+  ok((await texto('.bal-btn >> nth=0')).includes('1,20'), 'preço do botão editável');
+  ok(await pg.evaluate(() => { const d = window.__mock.banco().t.configuracoes[0].dados; return d.balcao?.[0]?.preco === 1.2 && d.respostas?.length === 10; }), 'botões salvos sem perder configurações');
+  await pg.goto(BASE + '#inicio'); await pg.waitForSelector('#painel .kpi');
+  ok((await texto('#painel')).includes('do balcão'), 'balcão entra no recebido do início');
+
   console.log('IA e desempenho');
   await pg.goto(BASE + '#conversas'); await pg.waitForSelector('#cv-ia');
   await esperar(300);
@@ -276,7 +307,7 @@ try {
 
   console.log('PC (1280 px)');
   await pg.setViewportSize({ width: 1280, height: 800 });
-  for (const t of ['inicio', 'pedidos', 'orcamento', 'clientes', 'receber', 'produtos', 'conversas', 'conversa/' + cliWa, 'desempenho']) {
+  for (const t of ['inicio', 'pedidos', 'orcamento', 'clientes', 'receber', 'produtos', 'conversas', 'conversa/' + cliWa, 'desempenho', 'balcao']) {
     await pg.goto(BASE + '#' + t); await esperar(500); await print(`pc-${t}`);
   }
   ok(await pg.evaluate(() => getComputedStyle(document.getElementById('nav')).width === '220px'), 'no PC a navegação vira lateral');

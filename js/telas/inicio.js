@@ -68,8 +68,10 @@ const barraLinha = (rotulo, valorTxt, fracao, extra = '', href = '') => {
 
 export async function montar(el, _p, vivo) {
   titulo('Início');
-  const [fichas, pags, clientes, naoLidas] = await Promise.all([
-    listar('fichas', { semExcluidos: true }), listar('pagamentos'), listar('clientes'), contarNaoLidas()]);
+  const [fichas, pagsPedidos, clientes, naoLidas, balcao] = await Promise.all([
+    listar('fichas', { semExcluidos: true }), listar('pagamentos'), listar('clientes'), contarNaoLidas(), listar('vendas_balcao').catch(() => [])]);
+  // vendas do balcão entram no dinheiro recebido (gráfico, formas de pagamento), mas não nos pedidos
+  const pags = [...pagsPedidos, ...balcao.map(v => ({ ficha_id: null, pago_em: v.vendido_em, valor_centavos: v.total_centavos, forma: v.forma, balcao: true }))];
   if (!vivo()) return;
   const cli = new Map(clientes.map(c => [c.id, c]));
   const pagosPor = new Map();
@@ -108,6 +110,7 @@ export async function montar(el, _p, vivo) {
     <div class="atalhos">
       <a class="atalho laranja" href="#orcamento">Novo orçamento<small>calcula com os preços do site</small></a>
       <a class="atalho turquesa" href="#orcamento/novo-pedido">Novo pedido<small>já vira pedido ao salvar</small></a>
+      <a class="atalho escuro" href="#balcao">Balcão<small>impressão e cópia rápida</small></a>
     </div>
     ${alertas.length ? `<section class="alertas" aria-label="Precisa de atenção">${alertas.map(([tipo, txt, href]) => `<a class="alerta-item ${tipo}" href="${href}"><span class="alerta-ponto" aria-hidden="true"></span><span>${esc(txt)}</span><span class="alerta-seta" aria-hidden="true">›</span></a>`).join('')}</section>` : ''}
     <div class="cabeca"><h2>Resumo</h2><div class="segmentado painel-periodo" role="group" aria-label="Período">${PERIODOS.map(([k, n]) => `<button type="button" data-per="${k}" aria-pressed="${k === periodo}">${n}</button>`).join('')}</div></div>
@@ -126,6 +129,7 @@ export async function montar(el, _p, vivo) {
     const noPer = (d, a = j.ini, b = j.fim) => d >= a && d <= b;
     const pagosPer = pags.filter(p => noPer(p.pago_em));
     const recebido = pagosPer.reduce((s, p) => s + p.valor_centavos, 0);
+    const doBalcao = pagosPer.filter(p => p.balcao).reduce((s, p) => s + p.valor_centavos, 0);
     const recebidoAnt = pags.filter(p => noPer(p.pago_em, j.antIni, j.antFim)).reduce((s, p) => s + p.valor_centavos, 0);
     const cols = j.cols.map(c => ({ ...c, valor: pags.filter(p => p.pago_em >= c.de && p.pago_em <= c.ate).reduce((s, p) => s + p.valor_centavos, 0) }));
 
@@ -154,7 +158,7 @@ export async function montar(el, _p, vivo) {
 
     el.querySelector('#painel').innerHTML = `
       <div class="kpis">
-        <div class="cartao kpi"><span class="sub">Recebido · ${esc(j.nome)}</span><div class="kpi-num">${moeda(recebido)}</div>${variacao(recebido, recebidoAnt, j.antes)}</div>
+        <div class="cartao kpi"><span class="sub">Recebido · ${esc(j.nome)}</span><div class="kpi-num">${moeda(recebido)}</div>${variacao(recebido, recebidoAnt, j.antes)}${doBalcao ? `<span class="kpi-var">${moeda(doBalcao)} do balcão</span>` : ''}</div>
         <a class="cartao kpi cartao-link" href="#receber"><span class="sub">A receber</span><div class="numero-grande kpi-num">${moeda(aReceber)}</div><span class="kpi-var">${devendo ? `${devendo} ${devendo === 1 ? 'pedido' : 'pedidos'} com valor em aberto` : 'nada em aberto'}</span></a>
         <div class="cartao kpi"><span class="sub">Vendido · ${esc(j.nome)}</span><div class="kpi-num">${moeda(vendido)}</div>${variacao(vendido, vendidoAnt, j.antes) || `<span class="kpi-var">${fechadas.length} ${fechadas.length === 1 ? 'pedido fechado' : 'pedidos fechados'}</span>`}</div>
         <a class="cartao kpi cartao-link" href="#pedidos"><span class="sub">Pedidos em andamento</span><div class="kpi-num">${emAndamento.length}</div><span class="kpi-var">${moeda(emAndamento.reduce((s, f) => s + f.total_centavos, 0))} em produção</span></a>
