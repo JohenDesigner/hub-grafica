@@ -179,18 +179,19 @@ function editarBotoes(lista, aoSalvar) {
   const desenhar = () => {
     area.innerHTML = `
       <div class="modal-topo"><h2>Botões do balcão</h2><button class="icone-btn" data-fechar-be aria-label="Fechar">${ICONE.fechar}</button></div>
-      <p class="sub">Nome curto e preço por unidade (por folha, cópia ou foto).</p>
-      ${itens.map((s, i) => `<div class="campo-linha be-item">
+      <p class="sub">Nome curto e preço por unidade (por folha, cópia ou foto). Arraste pelo <b>⠿</b> para mudar a ordem.</p>
+      <div class="be-lista">${itens.map((s, i) => `<div class="campo-linha be-item" data-pos="${i}">
+        <button class="be-alca" type="button" data-alca="${i}" aria-label="Arrastar ${esc(s.nome || 'botão')} (ou use as setas para cima e para baixo)">⠿</button>
         <label class="campo" style="flex:2"><span>Serviço</span><input data-i="${i}" data-c="nome" value="${esc(s.nome)}" maxlength="28"></label>
         <label class="campo" style="flex:1"><span>Preço (R$)</span><input data-i="${i}" data-c="preco" inputmode="decimal" value="${esc(Number(s.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 }))}"></label>
-        <button class="icone-btn" type="button" data-rem="${i}" aria-label="Apagar botão">${ICONE.lixo}</button></div>`).join('')}
-      <div class="botoes"><button class="btn" type="button" id="be-novo">+ Novo botão</button><button class="btn" type="button" id="be-padrao">Voltar ao padrão</button></div>
+        <button class="icone-btn" type="button" data-rem="${i}" aria-label="Apagar botão">${ICONE.lixo}</button></div>`).join('')}</div>
+      <div class="botoes"><button class="btn" type="button" id="be-novo">+ Novo botão</button></div>
       <button class="btn btn-primario btn-bloco rodape-fixo" type="button" id="be-salvar">Salvar botões</button>`;
     area.querySelector('[data-fechar-be]').addEventListener('click', () => fecharModal());
     area.querySelectorAll('[data-c]').forEach(c => c.addEventListener('input', () => { itens[c.dataset.i][c.dataset.c] = c.value; }));
     area.querySelectorAll('[data-rem]').forEach(b => b.addEventListener('click', () => { itens.splice(+b.dataset.rem, 1); desenhar(); }));
     area.querySelector('#be-novo').addEventListener('click', () => { itens.push({ nome: '', preco: '' }); desenhar(); area.querySelectorAll('.be-item input')[itens.length * 2 - 2]?.focus(); });
-    area.querySelector('#be-padrao').addEventListener('click', () => { itens = SERVICOS_PADRAO.map(s => ({ ...s })); desenhar(); });
+    ligarArrastar();
     area.querySelector('#be-salvar').addEventListener('click', async e => {
       const limpos = [];
       for (const s of itens) {
@@ -207,5 +208,55 @@ function editarBotoes(lista, aoSalvar) {
       catch (err) { avisar(err.message, 'erro'); e.target.disabled = false; }
     });
   };
+  // arrastar pela alça (toque ou mouse); setas do teclado também mudam a ordem
+  function ligarArrastar() {
+    const lista = area.querySelector('.be-lista');
+    const mover = (de, para) => {
+      if (para < 0 || para >= itens.length || de === para) return;
+      const [x] = itens.splice(de, 1); itens.splice(para, 0, x);
+      desenhar(); area.querySelector(`[data-alca="${para}"]`)?.focus();
+    };
+    lista.querySelectorAll('[data-alca]').forEach(h => {
+      h.addEventListener('keydown', e => {
+        if (e.key === 'ArrowUp') { e.preventDefault(); mover(+h.dataset.alca, +h.dataset.alca - 1); }
+        if (e.key === 'ArrowDown') { e.preventDefault(); mover(+h.dataset.alca, +h.dataset.alca + 1); }
+      });
+      h.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        const linha = h.closest('.be-item');
+        const origem = +h.dataset.alca;
+        const inicioY = e.clientY;
+        let alvo = origem;
+        const linhas = [...lista.querySelectorAll('.be-item')];
+        const alturas = linhas.map(l => l.getBoundingClientRect());
+        linha.classList.add('arrastando');
+        h.setPointerCapture(e.pointerId);
+        const aoMover = ev => {
+          const dy = ev.clientY - inicioY;
+          linha.style.transform = `translateY(${dy}px)`;
+          const meio = alturas[origem].top + alturas[origem].height / 2 + dy;
+          alvo = alturas.reduce((m, r, k) => (meio > r.top + r.height / 2 ? k : m), 0);
+          if (meio < alturas[0].top + alturas[0].height / 2) alvo = 0;
+          linhas.forEach((l, k) => {
+            if (k === origem) return;
+            const desloc = alturas[origem].height + 10;
+            l.style.transform = k > origem && k <= alvo ? `translateY(-${desloc}px)` : k < origem && k >= alvo ? `translateY(${desloc}px)` : '';
+          });
+          // rola a janela quando chega perto da borda
+          const caixa = area.closest('.modal-caixa');
+          if (caixa) { const r = caixa.getBoundingClientRect(); if (ev.clientY < r.top + 60) caixa.scrollTop -= 8; else if (ev.clientY > r.bottom - 60) caixa.scrollTop += 8; }
+        };
+        const soltar = () => {
+          h.removeEventListener('pointermove', aoMover);
+          linhas.forEach(l => { l.style.transform = ''; });
+          linha.classList.remove('arrastando');
+          if (alvo !== origem) mover(origem, alvo);
+        };
+        h.addEventListener('pointermove', aoMover);
+        h.addEventListener('pointerup', soltar, { once: true });
+        h.addEventListener('pointercancel', soltar, { once: true });
+      });
+    });
+  }
   desenhar();
 }

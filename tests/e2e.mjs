@@ -284,6 +284,14 @@ try {
   ok(venda && venda.total_centavos === 1000 && venda.subtotal_centavos === 1200 && venda.forma === 'dinheiro' && venda.itens.length === 2, 'venda salva com desconto e forma');
   ok((await texto('#b-hoje')).includes('10× Impressão P&B'), 'aparece em vendas de hoje');
   await pg.click('#b-editar'); await pg.waitForSelector('#be-salvar');
+  ok(await pg.locator('#be-padrao').count() === 0, 'sem botão voltar ao padrão');
+  { const h = pg.locator('[data-alca="0"]'); const b1 = await h.boundingBox(); const b3 = await pg.locator('.be-item').nth(2).boundingBox();
+    await pg.mouse.move(b1.x + b1.width / 2, b1.y + b1.height / 2); await pg.mouse.down();
+    for (let k = 1; k <= 10; k++) await pg.mouse.move(b1.x + b1.width / 2, b1.y + b1.height / 2 + (b3.y + b3.height / 2 - b1.y - b1.height / 2 + 30) * k / 10);
+    await pg.mouse.up(); }
+  ok((await pg.inputValue('.be-item >> nth=2 >> [data-c=nome]')) === 'Impressão P&B', 'arrastar muda a ordem');
+  await pg.locator('[data-alca="2"]').focus(); await pg.keyboard.press('ArrowUp'); await pg.keyboard.press('ArrowUp');
+  ok((await pg.inputValue('.be-item >> nth=0 >> [data-c=nome]')) === 'Impressão P&B', 'setas do teclado mudam a ordem');
   await pg.locator('.be-item').first().locator('[data-c=preco]').fill('1,20');
   await pg.click('#be-salvar'); await esperar(400);
   ok((await texto('.bal-btn >> nth=0')).includes('1,20'), 'preço do botão editável');
