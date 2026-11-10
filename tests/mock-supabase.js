@@ -5,7 +5,8 @@
   const USUARIO = { id: '11111111-1111-4111-8111-111111111111', email: 'teste@johen.com' };
   const SENHA = 'senha123';
   const carregar = () => { try { return JSON.parse(localStorage.getItem(CHAVE)); } catch { return null; } };
-  let banco = carregar() || { seq: 0, relogio: 0, sessao: null, t: { clientes: [], produtos: [], fichas: [], pagamentos: [], configuracoes: [] } };
+  let banco = carregar() || { seq: 0, relogio: 0, sessao: null, t: { clientes: [], produtos: [], fichas: [], pagamentos: [], configuracoes: [], whatsapp_mensagens: [] } };
+  banco.t.whatsapp_mensagens ||= [];
   const gravar = () => localStorage.setItem(CHAVE, JSON.stringify(banco));
   const agora = () => new Date(Date.now() + (++banco.relogio)).toISOString();
   window.__mock = { banco: () => banco, gravar, recarregar: () => { banco = carregar() || banco; } };
@@ -16,7 +17,8 @@
     produtos: () => ({ opcoes: [], preco: 0, m2_livre: 0, minimo: 0, minimo_por: 'total', acabamentos: [], prazo_dias: 3, ativo: true }),
     fichas: () => ({ itens: [], desconto: { tipo: 'reais', valor: 0 }, total_centavos: 0, etapa: 'orcamento', prazo: null, os_fpq: '', link_arte: '', observacoes: '', excluido_em: null }),
     pagamentos: () => ({ tipo: 'pagamento', pago_em: new Date().toISOString().slice(0, 10) }),
-    configuracoes: () => ({ dados: {} })
+    configuracoes: () => ({ dados: {} }),
+    whatsapp_mensagens: () => ({ direcao: 'recebida', tipo: 'text', texto: '', nome_contato: '', status: '', lida: false })
   };
 
   function checarPagamento(p) {
@@ -28,7 +30,8 @@
 
   class Consulta {
     constructor(t) { this.t = t; this.f = []; this.op = 'select'; this.ord = null; this.um = false; this.talvez = false; }
-    select() { return this; }
+    select(_c, o) { if (o?.count) { this.contar = true; } return this; }
+    in(c, vs) { this.f.push(r => vs.includes(r[c])); return this; }
     eq(c, v) { this.f.push(r => r[c] === v); return this; }
     ilike(c, p) { const s = p.replace(/%/g, '').toLowerCase(); this.f.push(r => String(r[c] || '').toLowerCase().includes(s)); return this; }
     is(c, v) { this.f.push(r => (r[c] ?? null) === v); return this; }
@@ -83,6 +86,7 @@
         if (this.t === 'fichas') banco.t.pagamentos = banco.t.pagamentos.filter(p => !alvo.some(f => f.id === p.ficha_id));
         gravar(); linhas = [];
       }
+      if (this.contar) return { data: null, count: linhas.length, error: null };
       if (this.um) return linhas.length === 1 ? { data: JSON.parse(JSON.stringify(linhas[0])), error: null } : { data: null, error: { message: 'JSON object requested, multiple (or no) rows returned' } };
       if (this.talvez) return { data: linhas[0] ? JSON.parse(JSON.stringify(linhas[0])) : null, error: null };
       return { data: linhas, error: null };
@@ -105,7 +109,7 @@
           async signInWithPassword({ email, password }) {
             const erro = rede(); if (erro) return { data: null, error: erro };
             if (email !== USUARIO.email || password !== SENHA) return { data: null, error: { message: 'Invalid login credentials' } };
-            banco.sessao = { user: USUARIO }; gravar(); return { data: { session: banco.sessao }, error: null };
+            banco.sessao = { user: USUARIO, access_token: 'token-de-teste' }; gravar(); return { data: { session: banco.sessao }, error: null };
           },
           async getSession() { banco = carregar() || banco; return { data: { session: banco.sessao }, error: null }; },
           async signOut() { banco.sessao = null; gravar(); return { error: null }; },

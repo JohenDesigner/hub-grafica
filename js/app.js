@@ -9,6 +9,7 @@ import * as clientes from './telas/clientes.js';
 import * as receber from './telas/receber.js';
 import * as produtos from './telas/produtos.js';
 import * as configuracoes from './telas/configuracoes.js';
+import * as conversas from './telas/conversas.js';
 
 registrar('inicio', { montar: inicio.montar });
 registrar('orcamento', { montar: orcamento.montar });
@@ -20,6 +21,8 @@ registrar('receber', { montar: receber.montar });
 registrar('produtos', { montar: produtos.montar });
 registrar('mais', { montar: configuracoes.montarMais });
 registrar('configuracoes', { montar: configuracoes.montar });
+registrar('conversas', { montar: conversas.montarLista });
+registrar('conversa', { montar: conversas.montarConversa });
 
 function mostrarRede() {
   document.getElementById('estado-rede').hidden = navigator.onLine;
@@ -77,6 +80,7 @@ async function começar() {
   enviarPendentes();
   chamar('limpa_lixeira');
   iniciar();
+  conversas.ouvirMensagens();
 }
 
 começar();

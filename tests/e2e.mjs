@@ -197,9 +197,52 @@ try {
   const [planilha] = await Promise.all([pg.waitForEvent('download'), pg.click('#cfg-exportar')]);
   ok(/^hub-grafica-\d{4}-\d{2}-\d{2}\.xlsx$/.test(planilha.suggestedFilename()), 'planilha de backup baixada');
 
+  console.log('Conversas do WhatsApp');
+  let enviado = null;
+  await pg.route('**/functions/v1/whatsapp-enviar', async r => {
+    enviado = JSON.parse(r.request().postData());
+    const msg = await pg.evaluate(e => {
+      const b = window.__mock.banco();
+      const m = { id: crypto.randomUUID(), user_id: b.sessao?.user?.id || '11111111-1111-4111-8111-111111111111', direcao: 'enviada', tipo: 'text', texto: e.texto, cliente_id: e.cliente_id, telefone: '5511900000002', status: 'sent', lida: true, criado_em: new Date().toISOString() };
+      b.t.whatsapp_mensagens.push(m); window.__mock.gravar(); return m;
+    }, enviado);
+    r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, mensagem: msg }) });
+  });
+  const cliWa = await pg.evaluate(() => {
+    const b = window.__mock.banco(); const U = '11111111-1111-4111-8111-111111111111';
+    const c = { id: crypto.randomUUID(), user_id: U, nome: 'Carla do Zap', whatsapp: '(11) 90000-0002', documento: '', endereco: '', observacoes: '', arquivado: false, criado_em: new Date().toISOString(), atualizado_em: new Date().toISOString() };
+    b.t.clientes.push(c);
+    const f = { id: crypto.randomUUID(), user_id: U, numero: ++b.seq, cliente_id: c.id, itens: [], desconto: { tipo: 'reais', valor: 0 }, total_centavos: 0, etapa: 'orcamento', prazo: null, os_fpq: '', link_arte: '', observacoes: '[WhatsApp] Quero 500 panfletos', excluido_em: null, criado_em: new Date().toISOString(), atualizado_em: new Date().toISOString(), etapa_em: new Date().toISOString() };
+    b.t.fichas.push(f);
+    const t0 = Date.now() - 60000;
+    b.t.whatsapp_mensagens.push(
+      { id: crypto.randomUUID(), user_id: U, direcao: 'recebida', tipo: 'text', texto: 'Oi! Quero 500 panfletos A5', cliente_id: c.id, ficha_id: f.id, telefone: '5511900000002', nome_contato: 'Carla', status: '', lida: false, criado_em: new Date(t0).toISOString() },
+      { id: crypto.randomUUID(), user_id: U, direcao: 'enviada', tipo: 'auto', texto: 'Olá, Carla! 👋 Aqui é a *Johen Arte Gráfica*.', cliente_id: c.id, ficha_id: f.id, telefone: '5511900000002', status: 'read', lida: true, criado_em: new Date(t0 + 2000).toISOString() });
+    window.__mock.gravar(); return c.id;
+  });
+  await pg.goto(BASE + '#conversas'); await pg.waitForSelector('#cv-lista .lista');
+  ok((await texto('#cv-lista')).includes('Carla do Zap'), 'conversa aparece na lista');
+  ok(await pg.locator('#cv-lista .conv-selo').count() === 1, 'mostra mensagem não lida');
+  ok(await pg.locator('#nav a[data-rota=conversas].ativo').count() === 1, 'menu marca Conversas');
+  await print('15-conversas');
+  await pg.click('#cv-lista .lista-item'); await pg.waitForSelector('.conv-bolha');
+  ok(await pg.locator('.conv-bolha.conv-ele').count() === 1 && await pg.locator('.conv-bolha.conv-eu').count() === 1, 'bolhas do cliente e da loja');
+  ok(/resposta automática/i.test(await texto('.conv-eu')), 'resposta automática identificada');
+  ok((await texto('#cv-ficha')).includes('Montar orçamento'), 'atalho para o orçamento da conversa');
+  await esperar(300);
+  ok(await pg.evaluate(id => window.__mock.banco().t.whatsapp_mensagens.filter(m => m.cliente_id === id && m.direcao === 'recebida').every(m => m.lida), cliWa), 'abrir a conversa marca como lida');
+  ok(await pg.locator('#cv-janela').isHidden(), 'dentro das 24h não mostra aviso');
+  await pg.fill('#cv-texto', 'Oi Carla! 500 panfletos A5 ficam R$ 120,00.'); await pg.click('.conv-enviar');
+  await pg.waitForFunction(() => document.querySelectorAll('.conv-bolha.conv-eu').length === 2 && !document.querySelector('.conv-enviando'));
+  ok(enviado?.cliente_id === cliWa && enviado.texto.includes('R$ 120,00'), 'resposta enviada pela função do WhatsApp');
+  ok((await pg.inputValue('#cv-texto')) === '', 'campo limpo depois de enviar');
+  await print('16-conversa');
+  await pg.click('#cv-ficha .btn-primario'); await pg.waitForSelector('#o-cliente');
+  ok((await texto('#o-cliente')).includes('Carla do Zap'), 'atalho abre o orçamento com o cliente');
+
   console.log('PC (1280 px)');
   await pg.setViewportSize({ width: 1280, height: 800 });
-  for (const t of ['inicio', 'pedidos', 'orcamento', 'clientes', 'receber', 'produtos']) {
+  for (const t of ['inicio', 'pedidos', 'orcamento', 'clientes', 'receber', 'produtos', 'conversas', 'conversa/' + cliWa]) {
     await pg.goto(BASE + '#' + t); await esperar(500); await print(`pc-${t}`);
   }
   ok(await pg.evaluate(() => getComputedStyle(document.getElementById('nav')).width === '220px'), 'no PC a navegação vira lateral');
