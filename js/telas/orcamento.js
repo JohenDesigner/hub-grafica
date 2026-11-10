@@ -14,6 +14,19 @@ import { escolherVersao } from '../conflito.js';
 import { pdfOrcamento } from '../pdf.js';
 
 const UUID = /^[0-9a-f-]{36}$/i;
+const RASCUNHO = 'hub_rascunho:';
+
+// Rascunhos abertos em outra aba ficam guardados no aparelho por 7 dias.
+function limparRascunhosVelhos() {
+  try {
+    for (const k of Object.keys(localStorage)) {
+      if (!k.startsWith(RASCUNHO)) continue;
+      const r = JSON.parse(localStorage.getItem(k) || 'null');
+      if (!r || Date.now() - r.quando > 7 * 864e5) localStorage.removeItem(k);
+    }
+  } catch {}
+}
+const ICONE_ABA = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
 const num = v => String(v ?? '').replace('.', ',');
 
 export async function montar(el, param, vivo) {
@@ -21,7 +34,15 @@ export async function montar(el, param, vivo) {
   const [cat, clientes, cfg] = await Promise.all([todosProdutos(), listar('clientes', { order: 'nome' }), carregarCfg()]);
   let ficha = { itens: [], desconto: { tipo: 'reais', valor: 0 }, prazo: '', observacoes: '', etapa: 'orcamento' };
   let virarAoSalvar = param === 'novo-pedido';
-  if (param && UUID.test(param)) {
+  let chaveRascunho = null, rascunho = null;
+  limparRascunhosVelhos();
+  if (param?.startsWith('rascunho:')) {
+    chaveRascunho = param.slice(9);
+    try { rascunho = JSON.parse(localStorage.getItem(RASCUNHO + chaveRascunho) || 'null'); } catch {}
+    if (!rascunho) { el.innerHTML = '<div class="cartao"><p>Este orçamento já foi salvo ou não está mais guardado neste aparelho.</p><a class="btn" href="#pedidos/orcamento">Ver orçamentos</a></div>'; return; }
+    ficha = rascunho.ficha; virarAoSalvar = !!rascunho.virarAoSalvar;
+    if (ficha.id && ficha.etapa !== 'orcamento') { ir('pedido', ficha.id); return; }
+  } else if (param && UUID.test(param)) {
     const f = await obter('fichas', param);
     if (!f) { el.innerHTML = '<p class="vazio">Orçamento não encontrado.</p>'; return; }
     if (f.etapa !== 'orcamento') { ir('pedido', f.id); return; }
@@ -30,8 +51,8 @@ export async function montar(el, param, vivo) {
   if (!vivo()) return;
 
   let cliente = clientes.find(c => c.id === ficha.cliente_id) || null;
-  let prazoManual = !!ficha.id;
-  let salvo = !!ficha.id;   // nada mudou desde a última gravação
+  let prazoManual = rascunho ? !!rascunho.prazoManual : !!ficha.id;
+  let salvo = !!ficha.id && !rascunho;   // nada mudou desde a última gravação
   const produtos = cat.lista;
 
   titulo(ficha.id ? `Orçamento nº ${ficha.numero ?? 'novo'}` : virarAoSalvar ? 'Novo pedido' : 'Novo orçamento');
@@ -48,6 +69,7 @@ export async function montar(el, param, vivo) {
     el.innerHTML = `
       ${cat.offline ? `<p class="aviso">Sem internet: usando os preços guardados${cat.quando ? ' de ' + data(cat.quando) : ''}.</p>` : ''}
       ${vencido ? '<p class="aviso">Este orçamento passou da validade. Confira os preços antes de reenviar.</p>' : ''}
+      <div class="o-barra"><button class="btn btn-peq" id="o-aba" type="button" title="Continua este orçamento numa aba nova e libera esta para outras coisas">${ICONE_ABA} Abrir em outra aba</button></div>
       <section class="cartao" id="o-cliente">
         <h3>Cliente</h3>
         ${cliente ? `
@@ -160,6 +182,7 @@ export async function montar(el, param, vivo) {
 
     // ações
     q('#o-salvar').addEventListener('click', () => gravar());
+    q('#o-aba').addEventListener('click', abrirEmOutraAba);
     q('#o-wpp')?.addEventListener('click', async e => {
       e.preventDefault();
       if (!salvo && !(await gravar({ silencioso: true }))) return;
@@ -182,6 +205,23 @@ export async function montar(el, param, vivo) {
     const inp = document.querySelector('#f-cli [name=nome]'); if (inp && nome) inp.value = nome;
   }
 
+  function abrirEmOutraAba() {
+    const base = location.href.split('#')[0];
+    let destino;
+    if (ficha.id && salvo) destino = `#orcamento/${ficha.id}`;
+    else {
+      const chave = chaveRascunho || crypto.randomUUID().slice(0, 8);
+      try { localStorage.setItem(RASCUNHO + chave, JSON.stringify({ ficha: { ...ficha, cliente_id: cliente?.id ?? ficha.cliente_id ?? null }, virarAoSalvar, prazoManual, quando: Date.now() })); }
+      catch { avisar('Sem espaço no aparelho para guardar o rascunho', 'erro'); return; }
+      destino = `#orcamento/rascunho:${chave}`;
+    }
+    const aba = window.open(base + destino, '_blank');
+    if (!aba) { avisar('O navegador bloqueou a aba nova. Permita pop-ups para o hub e tente de novo.', 'erro'); return; }
+    salvo = true;           // a outra aba ficou com o orçamento; esta pode sair sem perder nada
+    avisar('Orçamento aberto em outra aba');
+    ir('inicio');
+  }
+
   async function gravar({ silencioso = false, base = ficha.atualizado_em } = {}) {
     if (!cliente) { avisar('Escolha o cliente', 'erro'); return false; }
     if (!ficha.itens.length) { avisar('Adicione ao menos um item', 'erro'); return false; }
@@ -194,6 +234,7 @@ export async function montar(el, param, vivo) {
       const r = await salvar('fichas', reg, base);
       ficha = { ...ficha, ...reg, ...r };
       salvo = true; prazoManual = true;
+      if (chaveRascunho) { try { localStorage.removeItem(RASCUNHO + chaveRascunho); } catch {} chaveRascunho = null; rascunho = null; }
       history.replaceState(null, '', `#orcamento/${ficha.id}`);
       titulo(`Orçamento nº ${ficha.numero ?? 'novo'}`);
       if (!silencioso) avisar(r._pendente ? 'Salvo no aparelho — envia quando a internet voltar' : 'Orçamento salvo');

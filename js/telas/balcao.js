@@ -25,14 +25,14 @@ let forma = 'pix';
 const subtotal = () => carrinho.reduce((s, x) => s + emCentavos(x.preco * x.qtd), 0);
 const precoTxt = v => 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export async function montar(el, _p, vivo) {
-  titulo('Balcão');
+export async function montar(el, _p, vivo, { painel = false, aoRegistrar } = {}) {
+  if (!painel) titulo('Balcão');
   const cfg = await carregarCfg();
   if (!vivo()) return;
   let servicos = Array.isArray(cfg.balcao) && cfg.balcao.length ? cfg.balcao : SERVICOS_PADRAO;
 
   el.innerHTML = `
-    <div class="cabeca"><h2>Balcão</h2><button class="btn btn-peq" id="b-editar">${ICONE.editar.replace('<svg', '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"')} Editar botões</button></div>
+    <div class="cabeca">${painel ? '<span style="flex:1"></span>' : '<h2>Balcão</h2>'}<button class="btn btn-peq" id="b-editar">${ICONE.editar.replace('<svg', '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"')} Editar botões</button></div>
     <p class="sub">Impressões e cópias rápidas, sem cliente. Toque para somar; toque e segure para tirar um.</p>
     <div class="bal-grade" id="b-grade"></div>
     <section class="cartao bal-caixa" id="b-caixa"></section>
@@ -136,6 +136,7 @@ export async function montar(el, _p, vivo) {
       avisar(`Venda de ${moeda(total)} registrada (${NOMES_FORMA[forma]})`);
       carrinho = []; totalManual = null;
       desenhar(); carregarHoje();
+      aoRegistrar?.();
     } catch (err) { avisar(err.message, 'erro'); btn.disabled = false; }
   }
 

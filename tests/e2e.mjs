@@ -291,6 +291,30 @@ try {
   await pg.goto(BASE + '#inicio'); await pg.waitForSelector('#painel .kpi');
   ok((await texto('#painel')).includes('do balcão'), 'balcão entra no recebido do início');
 
+  console.log('Balcão flutuante e orçamento em outra aba');
+  await pg.goto(BASE + '#orcamento'); await pg.waitForSelector('#o-busca-cli');
+  await pg.fill('#o-busca-cli', 'ana'); await pg.click('#o-sug [data-cli]');
+  await pg.fill('#o-obs', 'Rascunho demorado');
+  ok(await pg.isVisible('#fab-balcao'), 'botão flutuante do balcão aparece');
+  await pg.click('#fab-balcao'); await pg.waitForSelector('#painel-balcao:not([hidden]) .bal-btn');
+  ok(await pg.isHidden('#fab-balcao'), 'botão some com o painel aberto');
+  await print('20-balcao-flutuante');
+  await pg.locator('#painel-conteudo .bal-btn').nth(2).click();
+  await pg.click('#painel-conteudo #b-registrar');
+  await pg.waitForSelector('#painel-balcao', { state: 'hidden' });
+  ok((await pg.inputValue('#o-obs')) === 'Rascunho demorado', 'orçamento continua igual depois do balcão');
+  ok(await pg.evaluate(() => window.__mock.banco().t.vendas_balcao.length === 2), 'venda do painel registrada');
+  await pg.click('#fab-balcao'); await pg.waitForSelector('#painel-balcao:not([hidden])');
+  await pg.click('#painel-fechar'); ok(await pg.isHidden('#painel-balcao'), 'fecha o painel no X');
+  const [aba] = await Promise.all([contexto.waitForEvent('page'), pg.click('#o-aba')]);
+  await aba.waitForSelector('#o-obs');
+  ok((await aba.inputValue('#o-obs')) === 'Rascunho demorado' && (await aba.textContent('#o-cliente')).includes('Ana Souza'), 'outra aba abre o mesmo orçamento');
+  await pg.waitForFunction(() => location.hash === '#inicio');
+  ok(true, 'aba atual volta para o início');
+  await aba.close();
+  await pg.goto(BASE + '#balcao'); await pg.waitForSelector('.bal-btn');
+  ok(await pg.isHidden('#fab-balcao'), 'sem botão flutuante dentro da própria tela do balcão');
+
   console.log('IA e desempenho');
   await pg.goto(BASE + '#conversas'); await pg.waitForSelector('#cv-ia');
   await esperar(300);

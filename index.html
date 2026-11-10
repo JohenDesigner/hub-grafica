@@ -45,6 +45,11 @@
   </form>
 </section>
 
+<button id="fab-balcao" class="fab-balcao" type="button" aria-label="Abrir o balcão" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4"/><rect x="3.5" y="8" width="17" height="8" rx="2"/><path d="M7 13h10v7H7z"/></svg><span>Balcão</span></button>
+<section id="painel-balcao" class="painel-balcao" hidden role="dialog" aria-modal="true" aria-label="Balcão">
+  <div class="painel-caixa"><div class="painel-topo"><b>Balcão</b><span class="sub">o que estava aberto continua lá</span><button class="icone-btn" type="button" id="painel-fechar" aria-label="Fechar o balcão"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div id="painel-conteudo" class="painel-conteudo"></div></div>
+</section>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div id="modal" class="modal" hidden></div>
 

@@ -28,6 +28,37 @@ registrar('desempenho', { montar: desempenho.montar });
 registrar('conversas', { montar: conversas.montarLista });
 registrar('conversa', { montar: conversas.montarConversa });
 
+// Botão flutuante do Balcão: abre por cima da tela atual (o orçamento aberto não se perde).
+let painelVersao = 0;
+function abrirPainelBalcao() {
+  const p = document.getElementById('painel-balcao');
+  const minha = ++painelVersao;
+  p.hidden = false; document.body.classList.add('com-painel');
+  document.getElementById('fab-balcao').hidden = true;
+  balcao.montar(document.getElementById('painel-conteudo'), undefined, () => minha === painelVersao && !p.hidden,
+    { painel: true, aoRegistrar: () => setTimeout(fecharPainelBalcao, 900) })
+    .catch(e => { document.getElementById('painel-conteudo').innerHTML = `<p class="vazio">${String(e.message || e).replace(/</g, '&lt;')}</p>`; });
+}
+function fecharPainelBalcao() {
+  const p = document.getElementById('painel-balcao');
+  if (p.hidden) return;
+  painelVersao++; p.hidden = true; document.body.classList.remove('com-painel');
+  document.getElementById('painel-conteudo').innerHTML = '';
+  ajustarFab();
+}
+function ajustarFab() {
+  const rota = (location.hash.slice(1) || 'inicio').split('/')[0];
+  document.getElementById('fab-balcao').hidden = rota === 'balcao' || !document.getElementById('painel-balcao').hidden;
+}
+function ligarBalcao() {
+  document.getElementById('fab-balcao').addEventListener('click', abrirPainelBalcao);
+  document.getElementById('painel-fechar').addEventListener('click', fecharPainelBalcao);
+  document.getElementById('painel-balcao').addEventListener('click', e => { if (e.target.id === 'painel-balcao') fecharPainelBalcao(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('modal').hidden) fecharPainelBalcao(); });
+  addEventListener('hashchange', () => { fecharPainelBalcao(); ajustarFab(); });
+  ajustarFab();
+}
+
 function mostrarRede() {
   document.getElementById('estado-rede').hidden = navigator.onLine;
 }
@@ -84,6 +115,7 @@ async function começar() {
   enviarPendentes();
   chamar('limpa_lixeira');
   iniciar();
+  ligarBalcao();
   conversas.ouvirMensagens();
 }
 
