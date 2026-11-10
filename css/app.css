@@ -370,3 +370,9 @@ body.com-painel{overflow:hidden}
 .be-alca:active{cursor:grabbing;background:var(--t-turquesa)}
 .be-alca:focus-visible{outline:2px solid var(--turquesa-esc)}
 .segmentado-quebra{flex-wrap:wrap}.segmentado-quebra button{flex:1 1 40%}
+.form-erro{margin:12px 0 0;color:var(--erro);font-weight:700}
+.form-erro:empty{display:none}
+.ei-outra{padding:0 12px 12px}
+.ei-valor{width:100%;min-height:44px;border:1px solid var(--linha);border-radius:var(--raio-p);background:var(--campo);font-family:var(--display);font-size:24px;font-weight:600;padding:4px 10px;font-variant-numeric:tabular-nums}
+.ei-valor:focus{outline:2px solid var(--laranja);border-color:transparent}
+#ei-calc .link{background:none;border:0;padding:0;color:var(--turquesa-esc);text-decoration:underline;font:inherit;cursor:pointer}

@@ -44,7 +44,10 @@ export function calcularItem(item) {
     else if (a.cobranca === 'm2') extra += n(a.valor) * area * q;
     else extra += n(a.valor);
   }
-  return { area, precoAplicado, centavos: emCentavos(base + extra) };
+  const calculado = emCentavos(base + extra);
+  // valor ajustado à mão pelo Johen depois do cálculo
+  const manual = item.valor_manual === null || item.valor_manual === undefined || item.valor_manual === '' ? NaN : Number(item.valor_manual);
+  return { area, precoAplicado, calculado, centavos: Number.isFinite(manual) && manual >= 0 ? emCentavos(manual) : calculado };
 }
 
 export function calcularFicha(itens, desconto) {

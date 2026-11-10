@@ -1,6 +1,6 @@
 export const URL_CATALOGO = 'https://johendesigner.github.io/Johen-site/novo/dados/produtos.json';
 export const NOMES_CATEGORIA = { cartoes: 'Cartões de Visita', panfletos: 'Panfletos', banners: 'Banners e Placas',
-  adesivos: 'Adesivos e Etiquetas', camisetas: 'Camisetas', canecas: 'Canecas e Térmicos', extras: 'Extras do hub' };
+  adesivos: 'Adesivos e Etiquetas', camisetas: 'Camisetas', canecas: 'Canecas e Térmicos', extras: 'Meus produtos' };
 const CACHE = 'hub_catalogo';
 
 export function prazoDias(texto) {

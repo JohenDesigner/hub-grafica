@@ -311,7 +311,7 @@ export function editorItem(produtos, existente, preProd = null) {
         <div class="modal-topo"><h2>Escolha o produto</h2><button class="icone-btn" data-fechar aria-label="Fechar">${ICONE.fechar}</button></div>
         <label class="campo"><span>Buscar</span><input id="ei-busca" type="search" autocomplete="off" placeholder="banner, cartão, caneca…"></label>
         <div class="abas" id="ei-cats" style="margin-top:12px"><button type="button" data-cat="" aria-pressed="true">Todos</button>
-          ${Object.entries(NOMES_CATEGORIA).filter(([k]) => produtos.some(p => p.categoria === k)).map(([k, v]) => `<button type="button" data-cat="${k}" aria-pressed="false">${esc(v)}</button>`).join('')}</div>
+          ${Object.entries(NOMES_CATEGORIA).sort(([a], [b]) => (b === 'extras') - (a === 'extras')).filter(([k]) => produtos.some(p => p.categoria === k)).map(([k, v]) => `<button type="button" data-cat="${k}" aria-pressed="false">${esc(v)}</button>`).join('')}</div>
         <ul class="lista" id="ei-lista" style="margin-top:12px"></ul>
         <button type="button" class="btn btn-bloco" id="ei-criar" style="margin-top:12px">${ICONE.mais.replace('<svg', '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"')}Criar produto novo</button>`;
       raiz.querySelector('#ei-criar').addEventListener('click', () => { pronto = { criarProduto: true }; fecharModal(); });
@@ -319,7 +319,9 @@ export function editorItem(produtos, existente, preProd = null) {
       const desenhar = () => {
         const t = raiz.querySelector('#ei-busca').value.trim().toLowerCase();
         const termos = t.split(/\s+/).filter(Boolean);
-        const vis = produtos.filter(p => (!cat || p.categoria === cat) && termos.every(w => p.nome.toLowerCase().includes(w))).slice(0, 60);
+        // os produtos criados no hub vêm primeiro (antes ficavam cortados no fim da lista)
+        const vis = produtos.filter(p => (!cat || p.categoria === cat) && termos.every(w => p.nome.toLowerCase().includes(w)))
+          .sort((a, b) => (b.origem === 'hub') - (a.origem === 'hub')).slice(0, 80);
         raiz.querySelector('#ei-lista').innerHTML = vis.length ? vis.map(p => `<li><button class="lista-item" data-p="${esc(p.id)}">
           <span class="meio"><span class="nome">${esc(p.nome)}</span><span class="det">${esc(NOMES_CATEGORIA[p.categoria] || '')}</span></span>
           <span class="fim valor" style="font-size:14px">${esc(aPartirDe(p))}</span></button></li>`).join('')
@@ -344,8 +346,12 @@ export function editorItem(produtos, existente, preProd = null) {
         quantidade: base?.quantidade ?? 1, opcao: base?.opcao ?? (prod.tipo === 'opcoes' && prod.opcoes.length === 1 ? prod.opcoes[0] : null),
         opcoes: prod.opcoes, livre: base?.livre ?? false, largura_cm: base?.largura_cm ?? '', altura_cm: base?.altura_cm ?? '',
         preco: prod.preco, m2_livre: prod.m2_livre, minimo: prod.minimo, minimo_por: prod.minimo_por,
-        acabamentos_produto: prod.acabamentos, acabamentos: base?.acabamentos ?? [], descricao: base?.descricao ?? ''
+        acabamentos_produto: prod.acabamentos, acabamentos: base?.acabamentos ?? [], descricao: base?.descricao ?? '',
+        valor_manual: base?.valor_manual ?? null
       };
+      const porUn = it.tipo === 'opcoes' && it.opcoes.some(o => /\bun\.?\s*$/i.test(o.label));
+      const outra = it.opcao?.manual ? it.opcao : null;
+      const qOutra = outra && porUn ? (String(outra.label).match(/\d+/) || [''])[0] : '';
       const medida = () => it.tipo === 'm2' || it.livre;
       raiz.innerHTML = `
         <div class="modal-topo"><h2>${esc(prod.nome)}</h2><button class="icone-btn" data-fechar aria-label="Fechar">${ICONE.fechar}</button></div>
@@ -355,6 +361,12 @@ export function editorItem(produtos, existente, preProd = null) {
             <ul class="lista" id="ei-opcoes">
               ${it.opcoes.map((o, i) => `<li><label class="lista-item" style="min-height:52px"><input type="radio" name="ei-op" value="${i}" ${!it.livre && it.opcao && o.label === it.opcao.label ? 'checked' : ''} style="width:22px;height:22px;accent-color:var(--laranja)">
                 <span class="meio">${esc(o.label)}</span><span class="valor">${moeda(emCentavos(o.preco))}</span></label></li>`).join('')}
+              <li><label class="lista-item" style="min-height:52px"><input type="radio" name="ei-op" value="outra" ${outra ? 'checked' : ''} style="width:22px;height:22px;accent-color:var(--laranja)">
+                <span class="meio">${porUn ? 'Outra quantidade' : 'Outra opção'}<span class="det" style="display:block">digite ${porUn ? 'a quantidade' : 'o nome'} e o valor</span></span></label></li>
+              <li id="ei-outra" ${outra ? '' : 'hidden'} class="ei-outra"><div class="grade-2">
+                ${porUn ? `<label class="campo"><span>Quantidade (un.)</span><input id="ei-o-q" inputmode="numeric" value="${esc(qOutra)}" placeholder="ex.: 2000"></label>`
+                        : `<label class="campo"><span>Nome da opção</span><input id="ei-o-n" value="${esc(outra?.label || '')}" placeholder="ex.: A3"></label>`}
+                <label class="campo"><span>Valor R$</span><input id="ei-o-v" inputmode="decimal" value="${outra ? esc(num(outra.preco)) : ''}" placeholder="ex.: 180,00"></label></div></li>
               ${it.m2_livre ? `<li><label class="lista-item" style="min-height:52px"><input type="radio" name="ei-op" value="livre" ${it.livre ? 'checked' : ''} style="width:22px;height:22px;accent-color:var(--laranja)">
                 <span class="meio">Outro tamanho<span class="det" style="display:block">${moeda(emCentavos(it.m2_livre))} o m²${it.minimo ? ` · mínimo ${moeda(emCentavos(it.minimo))} por peça` : ''}</span></span></label></li>` : ''}
             </ul></div>` : ''}
@@ -374,7 +386,8 @@ export function editorItem(produtos, existente, preProd = null) {
           ${esc(a.nome)} <span class="sub">+${moeda(emCentavos(a.valor))} ${a.cobranca === 'unidade' ? 'cada' : a.cobranca === 'm2' ? 'o m²' : ''}</span></label>`).join('')}</div>` : ''}
         <label class="campo"><span>Descrição (opcional)</span><input id="ei-desc" value="${esc(it.descricao)}" placeholder="ex.: logo frente, fundo azul" autocomplete="off"></label>
         <div class="cartao rodape-fixo" style="display:flex;align-items:center;gap:12px">
-          <div style="flex:1"><span class="sub">Valor do item</span><div class="numero-grande" id="ei-valor" style="font-size:26px">—</div>
+          <div style="flex:1;min-width:0"><label class="sub" for="ei-valor">Valor do item <span id="ei-calc"></span></label>
+            <input id="ei-valor" class="ei-valor" inputmode="decimal" aria-describedby="ei-calc" placeholder="—">
             <span class="selo alerta" id="ei-min" hidden>valor mínimo aplicado</span></div>
           <button class="btn btn-primario" id="ei-ok">${existente ? 'Salvar item' : 'Adicionar'}</button>
         </div>`;
@@ -388,20 +401,41 @@ export function editorItem(produtos, existente, preProd = null) {
         it.descricao = raiz.querySelector('#ei-desc').value.trim();
         it.acabamentos = [...raiz.querySelectorAll('[data-acab]')].filter(c => c.checked).map(c => it.acabamentos_produto[+c.dataset.acab]);
         const op = raiz.querySelector('[name=ei-op]:checked');
-        if (op) { it.livre = op.value === 'livre'; it.opcao = it.livre ? null : it.opcoes[+op.value]; }
+        if (op) {
+          it.livre = op.value === 'livre';
+          raiz.querySelector('#ei-outra').hidden = op.value !== 'outra';
+          if (op.value === 'outra') {
+            const q = parseInt((raiz.querySelector('#ei-o-q')?.value || '').replace(/\D/g, ''), 10);
+            const nomeOp = porUn ? (q > 0 ? `${q} un.` : '') : (raiz.querySelector('#ei-o-n')?.value || '').trim();
+            it.opcao = { label: nomeOp, preco: lerNumero(raiz.querySelector('#ei-o-v').value) || 0, manual: true };
+          } else it.opcao = it.livre ? null : it.opcoes[+op.value];
+        }
         raiz.querySelector('#ei-medidas').hidden = !medida();
-        const erro = validarItem(it);
-        const v = raiz.querySelector('#ei-valor');
-        if (erro) { v.textContent = '—'; v.title = erro; raiz.querySelector('#ei-min').hidden = true; return erro; }
-        const c = calcularItem(it).centavos;
-        v.textContent = moeda(c);
-        raiz.querySelector('#ei-min').hidden = !(it.minimo > 0 && calcularItem({ ...it, minimo: 0 }).centavos !== c);
+        let erro = validarItem(it);
+        if (!erro && it.opcao?.manual && !it.opcao.label) erro = porUn ? 'Digite a quantidade' : 'Digite o nome da opção';
+        const v = raiz.querySelector('#ei-valor'), dica = raiz.querySelector('#ei-calc');
+        if (erro) { if (document.activeElement !== v) v.value = ''; v.title = erro; dica.textContent = ''; raiz.querySelector('#ei-min').hidden = true; return erro; }
+        const r = calcularItem(it);
+        if (document.activeElement !== v) v.value = (r.centavos / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        dica.innerHTML = r.centavos !== r.calculado ? `· ajustado (calculado ${moeda(r.calculado)}) <button type="button" class="link" id="ei-volta">voltar</button>` : '';
+        raiz.querySelector('#ei-min').hidden = !(it.minimo > 0 && it.valor_manual == null && calcularItem({ ...it, minimo: 0 }).centavos !== r.centavos);
         return null;
       };
-      raiz.addEventListener('input', ler);
-      raiz.addEventListener('change', ler);
-      raiz.querySelector('#ei-menos').addEventListener('click', () => { const q = raiz.querySelector('#ei-q'); q.value = Math.max(1, (parseInt(q.value, 10) || 1) - 1); ler(); });
-      raiz.querySelector('#ei-mais').addEventListener('click', () => { const q = raiz.querySelector('#ei-q'); q.value = (parseInt(q.value, 10) || 0) + 1; ler(); });
+      // mudou quantidade/opção: o valor volta a ser o calculado
+      raiz.addEventListener('input', e => { if (e.target.id !== 'ei-valor' && e.target.id !== 'ei-desc') it.valor_manual = null; ler(); });
+      raiz.addEventListener('change', e => { if (e.target.id === 'ei-valor') return; if (e.target.id !== 'ei-desc') it.valor_manual = null; ler(); });
+      const valorCampo = raiz.querySelector('#ei-valor');
+      valorCampo.addEventListener('focus', () => valorCampo.select());
+      valorCampo.addEventListener('change', () => {
+        const x = lerNumero(valorCampo.value);
+        const calc = calcularItem({ ...it, valor_manual: null }).centavos;
+        it.valor_manual = Number.isFinite(x) && x >= 0 && emCentavos(x) !== calc ? x : null;
+        valorCampo.blur(); ler();
+      });
+      valorCampo.addEventListener('keydown', e => { if (e.key === 'Enter') valorCampo.blur(); });
+      raiz.addEventListener('click', e => { if (e.target.id === 'ei-volta') { it.valor_manual = null; ler(); } });
+      raiz.querySelector('#ei-menos').addEventListener('click', () => { const q = raiz.querySelector('#ei-q'); q.value = Math.max(1, (parseInt(q.value, 10) || 1) - 1); it.valor_manual = null; ler(); });
+      raiz.querySelector('#ei-mais').addEventListener('click', () => { const q = raiz.querySelector('#ei-q'); q.value = (parseInt(q.value, 10) || 0) + 1; it.valor_manual = null; ler(); });
       raiz.querySelector('#ei-ok').addEventListener('click', () => {
         const erro = ler();
         if (erro) { avisar(erro, 'erro'); return; }

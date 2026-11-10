@@ -56,7 +56,7 @@ export async function montar(el, _p, vivo, forcar = false) {
   const desenhar = () => {
     const t = el.querySelector('#p-busca').value.trim().toLowerCase();
     const vis = lista.filter(p => !t || p.nome.toLowerCase().includes(t));
-    const grupos = Object.keys(NOMES_CATEGORIA).map(cat => [cat, vis.filter(p => p.categoria === cat)]).filter(([, l]) => l.length);
+    const grupos = ['extras', ...Object.keys(NOMES_CATEGORIA).filter(k => k !== 'extras')].map(cat => [cat, vis.filter(p => p.categoria === cat)]).filter(([, l]) => l.length);
     el.querySelector('#p-lista').innerHTML = grupos.length ? grupos.map(([cat, l]) => `
       <p class="grupo-titulo">${esc(NOMES_CATEGORIA[cat])} (${l.length})</p>
       <ul class="lista">${l.map(p => `<li><button class="lista-item" data-id="${esc(p.id)}">
@@ -149,6 +149,7 @@ export function formExtra(p, depois, { aoCancelar } = {}) {
         <label class="campo"><span>Prazo (dias úteis)</span><input name="prazo_dias" type="number" min="0" value="${r?.prazo_dias ?? 3}" inputmode="numeric"></label>
         <label class="check" style="align-self:end"><input type="checkbox" name="ativo" ${r?.ativo === false ? '' : 'checked'}> Ativo</label>
       </div>
+      <p class="form-erro" id="x-erro" role="alert"></p>
       <div class="botoes" style="margin-top:16px">
         ${r ? `<button type="button" class="btn btn-perigo" id="x-excluir">Excluir</button>` : ''}
         <button class="btn btn-primario" type="submit">Salvar</button>
@@ -188,24 +189,28 @@ export function formExtra(p, depois, { aoCancelar } = {}) {
     const preco = lerNumero(f.preco.value), minimo = lerNumero(f.minimo.value) || 0;
     const qtds = [...caixa.querySelectorAll('[data-linha="qtd"]')].map(l => ({
       q: parseInt(l.querySelector('[data-k=qtd]').value.replace(/\D/g, ''), 10), preco: lerNumero(l.querySelector('[data-k=preco]').value),
-      vazio: !l.querySelector('[data-k=qtd]').value.trim() && !l.querySelector('[data-k=preco]').value.trim() })).filter(x => !x.vazio);
+      // linha sem valor é ignorada (ex.: deixou o 1000 un. em branco)
+      vazio: !l.querySelector('[data-k=preco]').value.trim() })).filter(x => !x.vazio);
     let erro = '';
     if (!nome) erro = 'Informe o nome';
     else if (tipo === 'qtd' && !qtds.length) erro = 'Coloque ao menos uma quantidade com valor';
-    else if (tipo === 'qtd' && qtds.some(x => !(x.q > 0) || !(x.preco > 0))) erro = 'Cada linha precisa de quantidade e valor';
+    else if (tipo === 'qtd' && qtds.some(x => !(x.q > 0))) erro = 'Tem valor sem quantidade';
+    else if (tipo === 'qtd' && qtds.some(x => !(x.preco > 0))) erro = 'Valor precisa ser maior que zero';
     else if (tipo === 'qtd' && new Set(qtds.map(x => x.q)).size !== qtds.length) erro = 'Tem quantidade repetida';
     else if (tipo === 'opcoes' && !opcoes.some(o => o.label && o.preco > 0)) erro = 'Cadastre ao menos uma opção';
     else if (tipo === 'opcoes' && opcoes.some(o => !o.label || !(o.preco > 0))) erro = 'Cada opção precisa de nome e preço';
     else if (tipo !== 'opcoes' && tipo !== 'qtd' && !(preco > 0)) erro = 'Preço precisa ser maior que zero';
     else if (acabamentos.some(a => !(a.valor >= 0))) erro = 'Valor do acabamento inválido';
     else if (tipo !== 'm2' && acabamentos.some(a => a.cobranca === 'm2')) erro = 'Acabamento por m² só em produto por m²';
-    if (erro) { avisar(erro, 'erro'); return; }
+    const caixaErro = caixa.querySelector('#x-erro');
+    caixaErro.textContent = erro;
+    if (erro) { avisar(erro, 'erro'); caixaErro.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
     const tipoBanco = tipo === 'qtd' ? 'opcoes' : tipo;
     const opcoesBanco = tipo === 'qtd' ? qtds.sort((a, b) => a.q - b.q).map(x => ({ label: `${x.q} un.`, preco: x.preco })) : tipo === 'opcoes' ? opcoes : [];
     const reg = { ...(r ? { id: r.id } : {}), nome, tipo: tipoBanco, opcoes: opcoesBanco, preco: tipoBanco === 'opcoes' ? 0 : preco,
       m2_livre: 0, minimo, minimo_por: f.minimo_por.value, acabamentos,
       prazo_dias: Math.max(0, parseInt(f.prazo_dias.value, 10) || 0), ativo: f.ativo.checked };
-    try { const s = await salvar('produtos', reg); salvouReg = { ...reg, ...s }; fecharModal(); avisar('Produto salvo'); depois(salvouReg); }
-    catch (err) { avisar(err.message, 'erro'); }
+    try { const s = await salvar('produtos', reg); salvouReg = { ...reg, ...s }; fecharModal(); avisar(s?._pendente ? 'Produto salvo no aparelho — envia quando a internet voltar' : `"${nome}" salvo em Produtos`); depois(salvouReg); }
+    catch (err) { caixa.querySelector('#x-erro').textContent = err.message; avisar(err.message, 'erro'); }
   });
 }
