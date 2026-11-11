@@ -5,7 +5,7 @@ import { NOMES_CATEGORIA } from '../catalogo.js';
 import { moeda, data, lerNumero, hojeISO, soDigitos } from '../formato.js';
 import { mensagem, linkWa, detalheItem } from '../whatsapp.js';
 import { esc, avisar, abrirModal, fecharModal, titulo, ICONE } from '../ui.js';
-import { ir } from '../rotas.js';
+import { ir, protegerSaida } from '../rotas.js';
 import { todosProdutos, aPartirDe, formExtra, extraParaProduto } from './produtos.js';
 import { formClienteRapido } from './clientes.js';
 import { carregarCfg } from './configuracoes.js';
@@ -55,6 +55,25 @@ export async function montar(el, param, vivo) {
   let salvo = !!ficha.id && !rascunho;   // nada mudou desde a última gravação
   const produtos = cat.lista;
 
+  // Cópia automática no aparelho a cada mudança: se o app fechar, a bateria acabar ou você sair sem querer,
+  // o orçamento volta na próxima vez que abrir esta tela.
+  const chaveAuto = () => RASCUNHO + 'auto-' + (ficha.id || 'novo');
+  const temConteudo = () => ficha.itens.length > 0 || !!String(ficha.observacoes || '').trim() || Number(ficha.desconto?.valor) > 0;
+  function guardarAuto() {
+    if (chaveRascunho || !temConteudo()) return;
+    try { localStorage.setItem(chaveAuto(), JSON.stringify({ ficha: { ...ficha, cliente_id: cliente?.id ?? ficha.cliente_id ?? null }, virarAoSalvar, prazoManual, quando: Date.now() })); } catch {}
+  }
+  function apagarAuto(chave = chaveAuto()) { try { localStorage.removeItem(chave); } catch {} }
+  let recuperavel = null;
+  if (!rascunho) {
+    try {
+      const r = JSON.parse(localStorage.getItem(chaveAuto()) || 'null');
+      if (r && (!ficha.id || r.quando > Date.parse(ficha.atualizado_em || 0))) recuperavel = r;
+      else if (r) apagarAuto();
+    } catch {}
+  }
+  protegerSaida(() => !salvo && temConteudo());
+
   titulo(ficha.id ? `Orçamento nº ${ficha.numero ?? 'novo'}` : virarAoSalvar ? 'Novo pedido' : 'Novo orçamento');
 
   const prazoSugerido = () => {
@@ -69,6 +88,8 @@ export async function montar(el, param, vivo) {
     el.innerHTML = `
       ${cat.offline ? `<p class="aviso">Sem internet: usando os preços guardados${cat.quando ? ' de ' + data(cat.quando) : ''}.</p>` : ''}
       ${vencido ? '<p class="aviso">Este orçamento passou da validade. Confira os preços antes de reenviar.</p>' : ''}
+      ${recuperavel ? `<div class="aviso" id="o-recuperar"><p style="margin:0">Você tinha ${ficha.id ? 'mudanças neste orçamento' : 'um orçamento'} sem salvar (${esc(new Date(recuperavel.quando).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))}, ${recuperavel.ficha.itens.length} ${recuperavel.ficha.itens.length === 1 ? 'item' : 'itens'}).</p>
+        <div class="botoes"><button class="btn" type="button" data-rec="nao">Descartar</button><button class="btn btn-primario" type="button" data-rec="sim">Recuperar</button></div></div>` : ''}
       <div class="o-barra"><button class="btn btn-peq" id="o-aba" type="button" title="Continua este orçamento numa aba nova e libera esta para outras coisas">${ICONE_ABA} Abrir em outra aba</button></div>
       <section class="cartao" id="o-cliente">
         <h3>Cliente</h3>
@@ -136,10 +157,19 @@ export async function montar(el, param, vivo) {
     el.querySelector('#o-total').textContent = moeda(r.total);
   }
 
-  function mudou() { salvo = false; }
+  function mudou() { salvo = false; guardarAuto(); }
 
   function ligar() {
     const q = s => el.querySelector(s);
+    q('#o-recuperar')?.addEventListener('click', e => {
+      const b = e.target.closest('[data-rec]'); if (!b) return;
+      if (b.dataset.rec === 'sim') {
+        ficha = recuperavel.ficha; virarAoSalvar = !!recuperavel.virarAoSalvar; prazoManual = !!recuperavel.prazoManual;
+        cliente = clientes.find(c => c.id === ficha.cliente_id) || null; salvo = false;
+        avisar('Orçamento recuperado');
+      } else apagarAuto();
+      recuperavel = null; desenhar();
+    });
     // cliente
     q('#o-trocar')?.addEventListener('click', () => { cliente = null; ficha.cliente_id = null; mudou(); desenhar(); q('#o-busca-cli')?.focus(); });
     const busca = q('#o-busca-cli'), sug = q('#o-sug');
@@ -225,7 +255,7 @@ export async function montar(el, param, vivo) {
     }
     const aba = window.open(base + destino, '_blank');
     if (!aba) { avisar('O navegador bloqueou a aba nova. Permita pop-ups para o hub e tente de novo.', 'erro'); return; }
-    salvo = true;           // a outra aba ficou com o orçamento; esta pode sair sem perder nada
+    salvo = true; apagarAuto();   // a outra aba ficou com o orçamento; esta pode sair sem perder nada
     avisar('Orçamento aberto em outra aba');
     ir('inicio');
   }
@@ -240,7 +270,9 @@ export async function montar(el, param, vivo) {
     const btn = el.querySelector('#o-salvar'); if (btn) btn.disabled = true;
     try {
       const r = await salvar('fichas', reg, base);
+      apagarAuto();
       ficha = { ...ficha, ...reg, ...r };
+      apagarAuto();
       salvo = true; prazoManual = true;
       if (chaveRascunho) { try { localStorage.removeItem(RASCUNHO + chaveRascunho); } catch {} chaveRascunho = null; rascunho = null; }
       history.replaceState(null, '', `#orcamento/${ficha.id}`);

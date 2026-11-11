@@ -12,13 +12,30 @@ export function avisar(texto, tipo = 'ok') {
   tToast = setTimeout(() => { t.className = 'toast'; }, 3000);
 }
 
-let aoFechar = null;
+let aoFechar = null, sujo = false, apertouFora = false;
+// true quando a caixa aberta tem algo digitado/escolhido que ainda não foi salvo.
+export function modalSujo() { return !document.getElementById('modal').hidden && sujo; }
+// Avisa sem fechar: a caixa dá uma balançada e aparece a dica.
+export function segurarModal() {
+  const c = document.querySelector('#modal .modal-caixa');
+  c?.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }], { duration: 250 });
+  avisar('Para fechar sem salvar, toque no X', 'erro');
+}
 export function abrirModal(html, { fechar } = {}) {
   const m = document.getElementById('modal');
   m.innerHTML = `<div class="modal-caixa" role="dialog" aria-modal="true">${html}</div>`;
   m.hidden = false;
   aoFechar = fechar || null;
-  m.onclick = e => { if (e.target === m) fecharModal(); };
+  sujo = false;
+  m.oninput = m.onchange = () => { sujo = true; };
+  // Só fecha clicando fora se o clique COMEÇOU fora (selecionar texto e soltar fora não fecha mais)
+  // e se não tiver nada digitado na caixa.
+  m.onpointerdown = e => { apertouFora = e.target === m; };
+  m.onclick = e => {
+    if (e.target !== m || !apertouFora) return;
+    apertouFora = false;
+    if (sujo) segurarModal(); else fecharModal();
+  };
   m.querySelectorAll('[data-fechar]').forEach(b => b.addEventListener('click', () => fecharModal()));
   const foco = m.querySelector('input,select,textarea,button:not([data-fechar])');
   if (foco && matchMedia('(min-width: 900px)').matches) foco.focus();
@@ -30,6 +47,7 @@ export function fecharModal() {
   if (m.hidden) return;
   m.hidden = true;
   m.innerHTML = '';
+  sujo = false;
   const f = aoFechar; aoFechar = null;
   if (f) f();
 }

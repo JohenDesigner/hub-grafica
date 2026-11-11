@@ -1,13 +1,46 @@
 // Troca de tela pelo #hash da URL.
+import { modalSujo, segurarModal, fecharModal, confirmar } from './ui.js';
+
 const rotas = {};
 const SECAO = { balcao: 'inicio', desempenho: 'inicio', conversa: 'conversas', pedido: 'pedidos', cliente: 'clientes', receber: 'mais', produtos: 'mais', configuracoes: 'mais', lixeira: 'mais' };
 
 export function registrar(nome, def) { rotas[nome] = def; }
-export function ir(nome, params) { location.hash = params ? `${nome}/${params}` : nome; }
+export function ir(nome, params) {
+  const h = '#' + (params ? `${nome}/${params}` : nome);
+  if (h !== location.hash) pulaGuarda = true;   // navegação pedida pelo próprio app não pergunta nada
+  location.hash = h;
+}
 export function rotaAtual() { return (location.hash.slice(1) || 'inicio').split('/'); }
+
+// Proteção contra sair sem salvar: a tela aberta diz se tem coisa pendente.
+// Vale para o botão voltar (celular e mouse), links do menu e fechar/recarregar a aba.
+let guarda = null, pulaGuarda = false, desfazendo = false;
+export function protegerSaida(temPendente) { guarda = temPendente; }
+const pendente = () => { try { return !!guarda?.(); } catch { return false; } };
+
+function desfazer(e) { desfazendo = true; location.hash = new URL(e.oldURL).hash || '#inicio'; }
+
+async function aoTrocarHash(e) {
+  if (desfazendo) { desfazendo = false; return; }
+  if (pulaGuarda) { pulaGuarda = false; render(); return; }
+  const destino = location.hash;
+  // Caixa aberta com coisa digitada: não sai, avisa. Caixa vazia: fecha e segue.
+  if (modalSujo()) { desfazer(e); segurarModal(); return; }
+  fecharModal();
+  if (pendente()) {
+    desfazer(e);
+    if (!await confirmar('Você tem um orçamento sem salvar. Sair mesmo assim?', { ok: 'Sair sem salvar', cancelar: 'Continuar aqui', perigo: true })) return;
+    guarda = null;
+    pulaGuarda = true; location.hash = destino;
+    return;
+  }
+
+  render();
+}
 
 let versao = 0;
 async function render() {
+  guarda = null;
   const [nome, param] = rotaAtual();
   const r = rotas[nome] || rotas.inicio;
   const secao = SECAO[nome] || nome;
@@ -29,4 +62,8 @@ async function render() {
 }
 
 export function recarregar() { render(); }
-export function iniciar() { addEventListener('hashchange', render); render(); }
+export function iniciar() {
+  addEventListener('hashchange', aoTrocarHash);
+  addEventListener('beforeunload', e => { if (modalSujo() || pendente()) { e.preventDefault(); e.returnValue = ''; } });
+  render();
+}

@@ -53,7 +53,10 @@ function ajustarFab() {
 function ligarBalcao() {
   document.getElementById('fab-balcao').addEventListener('click', abrirPainelBalcao);
   document.getElementById('painel-fechar').addEventListener('click', fecharPainelBalcao);
-  document.getElementById('painel-balcao').addEventListener('click', e => { if (e.target.id === 'painel-balcao') fecharPainelBalcao(); });
+  // só fecha clicando fora se o clique começou fora (selecionar um número e soltar fora não fecha)
+  let apertouFora = false;
+  document.getElementById('painel-balcao').addEventListener('pointerdown', e => { apertouFora = e.target.id === 'painel-balcao'; });
+  document.getElementById('painel-balcao').addEventListener('click', e => { if (e.target.id === 'painel-balcao' && apertouFora) fecharPainelBalcao(); });
   addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('modal').hidden) fecharPainelBalcao(); });
   addEventListener('hashchange', () => { fecharPainelBalcao(); ajustarFab(); });
   ajustarFab();

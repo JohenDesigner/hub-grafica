@@ -443,6 +443,35 @@ try {
   await pg.click('#o-add'); ok((await texto('#ei-lista li >> nth=0')).includes('Adesivo redondo') || (await texto('#ei-lista li >> nth=0')).includes('Placa de PVC'), 'meus produtos aparecem primeiro sem buscar');
   await pg.click('#modal [data-fechar]');
 
+  console.log('Não perder o que foi digitado');
+  // caixa com coisa digitada: clicar fora não fecha; selecionar texto e soltar fora também não
+  await pg.click('#o-add'); await pg.fill('#ei-busca', 'lona');
+  await pg.mouse.click(5, 5); await esperar(300);
+  ok(await pg.locator('#modal').isVisible(), 'clicar fora com algo digitado não fecha a caixa');
+  const caixaB = await pg.locator('#ei-busca').boundingBox();
+  await pg.mouse.move(caixaB.x + 5, caixaB.y + caixaB.height / 2); await pg.mouse.down(); await pg.mouse.move(3, 3); await pg.mouse.up(); await esperar(200);
+  ok(await pg.locator('#modal').isVisible(), 'selecionar texto e soltar fora não fecha a caixa');
+  await pg.evaluate(() => history.back()); await esperar(400);
+  ok(await pg.locator('#modal').isVisible(), 'voltar com caixa preenchida não fecha a caixa');
+  ok(await pg.evaluate(() => location.hash.startsWith('#orcamento')), 'voltar com caixa preenchida fica no orçamento');
+  await pg.click('#modal [data-fechar]');
+  ok(await pg.locator('#modal').isHidden(), 'o X fecha a caixa');
+  // sair do orçamento sem salvar pergunta antes; a cópia automática fica guardada
+  await pg.evaluate(() => { location.hash = '#inicio'; }); await pg.waitForSelector('#modal [data-ok]');
+  ok((await texto('#modal')).includes('sem salvar'), 'sair do orçamento sem salvar pergunta antes');
+  await pg.click('#modal [data-fechar]'); await esperar(300);
+  ok(await pg.evaluate(() => location.hash.startsWith('#orcamento')), '"Continuar aqui" fica no orçamento');
+  ok(await pg.locator('#o-itens').isVisible(), 'o orçamento continua na tela');
+  await pg.evaluate(() => { location.hash = '#inicio'; }); await pg.waitForSelector('#modal [data-ok]');
+  await pg.click('#modal [data-ok]'); await pg.waitForSelector('#painel .kpi');
+  await pg.evaluate(() => { location.hash = '#orcamento'; }); await pg.waitForSelector('#o-recuperar');
+  ok(true, 'ao voltar no Orçamento oferece recuperar');
+  await pg.click('#o-recuperar [data-rec=sim]');
+  ok((await texto('#o-itens')).length > 0 && !(await texto('#o-itens')).includes('Nenhum item'), 'recuperar traz os itens de volta');
+  await pg.evaluate(() => { location.hash = '#inicio'; }); await pg.waitForSelector('#modal [data-ok]'); await pg.click('#modal [data-ok]');
+  await pg.evaluate(() => { location.hash = '#orcamento'; }); await pg.waitForSelector('#o-recuperar'); await pg.click('#o-recuperar [data-rec=nao]');
+  ok(await pg.locator('#o-recuperar').count() === 0, 'descartar some com o aviso');
+
   console.log('Zerar resumo');
   await pg.goto(BASE + '#inicio'); await pg.waitForSelector('#painel .kpi');
   const antes = await texto('#painel .kpi >> nth=0');
