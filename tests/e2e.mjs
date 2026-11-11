@@ -77,6 +77,47 @@ try {
   ok((await texto('main')).includes('Ana Souza'), 'cliente criado e detalhe aberto');
   await print('04-cliente');
 
+  console.log('Busca por CNPJ');
+  await pg.route('https://brasilapi.com.br/api/cnpj/v1/**', r => r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+    body: JSON.stringify({ razao_social: 'PADARIA EXEMPLO LTDA', nome_fantasia: 'PADARIA DO BAIRRO', descricao_situacao_cadastral: 'ATIVA', ddd_telefone_1: '1133334444',
+      email: 'OI@PADARIA.COM', descricao_tipo_de_logradouro: 'RUA', logradouro: 'DAS FLORES', numero: '120', complemento: '', bairro: 'CENTRO', municipio: 'SAO PAULO', uf: 'SP', cep: '01001000' }) }));
+  await pg.goto(BASE + '#clientes'); await pg.waitForSelector('#c-novo');
+  await pg.click('#c-novo');
+  await pg.fill('#f-cli [name=documento]', '1234');
+  await pg.fill('#f-cli [name=documento]', '00000000000192');
+  ok((await texto('#f-cnpj')).includes('não existe'), 'CNPJ errado avisa');
+  await pg.fill('#f-cli [name=documento]', '00000000000191');
+  await pg.waitForFunction(() => document.querySelector('#f-cnpj').textContent.startsWith('✓'));
+  ok(await pg.inputValue('#f-cli [name=nome]') === 'Padaria do Bairro', 'CNPJ preenche o nome');
+  ok(await pg.inputValue('#f-cli [name=endereco]') === 'Rua das Flores, 120 - Centro - Sao Paulo/SP - CEP 01001-000', 'CNPJ preenche o endereço');
+  ok(await pg.inputValue('#f-cli [name=documento]') === '00.000.000/0001-91', 'CNPJ fica formatado');
+  ok(await pg.inputValue('#f-cli [name=whatsapp]') === '', 'telefone fixo não vai pro WhatsApp');
+  ok((await pg.inputValue('#f-cli [name=observacoes]')).includes('Telefone: (11) 3333-4444'), 'telefone fixo vai pras observações');
+  await print('04b-cliente-cnpj');
+  await pg.click('[data-fechar]'); await esperar(300);
+
+  console.log('Cadastro rápido no orçamento (CNPJ e CEP)');
+  await pg.route('https://brasilapi.com.br/api/cep/v2/**', r => r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+    body: JSON.stringify({ cep: '04431160', state: 'SP', city: 'São Paulo', neighborhood: 'Jardim Selma', street: 'Rua Pedro Fernandes Aragão' }) }));
+  await pg.goto(BASE + '#orcamento'); await pg.waitForSelector('#o-novo-cli');
+  await pg.click('#o-novo-cli'); await pg.waitForSelector('#f-mais');
+  ok(await pg.locator('#f-extra').isHidden(), 'cadastro rápido começa só com nome e WhatsApp');
+  await print('05a-rapido');
+  await pg.click('#f-mais');
+  ok(await pg.locator('#f-cli [name=documento]').isVisible(), 'botão Empresa mostra CNPJ e CEP');
+  await pg.fill('#f-cli [name=cep]', '04431160');
+  await pg.waitForFunction(() => document.querySelector('#f-cep').textContent.startsWith('✓'));
+  await pg.fill('#f-cli [name=numero]', '45');
+  ok(await pg.inputValue('#f-cli [name=endereco]') === 'Rua Pedro Fernandes Aragão, 45 - Jardim Selma - São Paulo/SP - CEP 04431-160', 'CEP + número montam o endereço');
+  await pg.fill('#f-cli [name=documento]', '00000000000191');
+  await pg.waitForFunction(() => document.querySelector('#f-cnpj').textContent.startsWith('✓'));
+  ok(await pg.inputValue('#f-cli [name=nome]') === 'Padaria do Bairro', 'CNPJ no cadastro rápido preenche o nome');
+  ok((await pg.inputValue('#f-cli [name=endereco]')).startsWith('Rua Pedro'), 'CNPJ não troca o endereço que veio do CEP');
+  await print('05b-rapido-empresa');
+  await pg.click('#f-cli [type=submit]'); await esperar(500);
+  ok((await texto('main')).includes('Padaria do Bairro'), 'cliente empresa salvo e escolhido no orçamento');
+  await pg.click('#o-trocar');   // deixa o orçamento sem cliente para o próximo bloco
+
   console.log('Orçamento');
   await pg.goto(BASE + '#orcamento'); await pg.waitForSelector('#o-busca-cli');
   await pg.fill('#o-busca-cli', 'ana'); await pg.click('#o-sug [data-cli]');

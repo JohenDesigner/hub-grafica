@@ -5,6 +5,7 @@ import { NOMES_ETAPA } from '../calc.js';
 import { linkWa } from '../whatsapp.js';
 import { esc, avisar, confirmar, abrirModal, fecharModal, titulo, lerForm, ICONE } from '../ui.js';
 import { ir } from '../rotas.js';
+import { buscarCnpj, buscarCep, cnpjValido, formatarCnpj, linhaEndereco } from '../cnpj.js';
 
 const iniciais = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
 const avatar = n => `<span aria-hidden="true" style="flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--t-turquesa);color:var(--turquesa-esc);font-weight:700;font-size:14px">${esc(iniciais(n))}</span>`;
@@ -44,22 +45,107 @@ export function formCliente(c, aoSalvar, { rapido = false } = {}) {
     <form id="f-cli">
       <label class="campo"><span>Nome</span><input name="nome" value="${esc(c?.nome || '')}" autocomplete="off" required></label>
       <label class="campo" style="margin-top:12px"><span>WhatsApp</span><input name="whatsapp" value="${esc(c?.whatsapp || '')}" inputmode="tel" placeholder="(11) 90000-0000" autocomplete="off"></label>
-      ${rapido ? '' : `
+      ${rapido ? `<button type="button" class="btn btn-peq" id="f-mais" style="margin-top:12px">🏢 Empresa? Buscar pelo CNPJ ou CEP</button>` : ''}
+      <div id="f-extra"${rapido ? ' hidden' : ''}>
       <label class="campo" style="margin-top:12px"><span>CPF ou CNPJ</span><input name="documento" value="${esc(c?.documento || '')}" inputmode="numeric" autocomplete="off"></label>
+      <p class="sub" id="f-cnpj" aria-live="polite" style="margin:6px 0 0;font-size:13px">Digite o CNPJ que o app preenche os dados da empresa.</p>
+      <div class="campo-linha" style="margin-top:12px">
+        <label class="campo"><span>CEP</span><input name="cep" inputmode="numeric" placeholder="00000-000" autocomplete="off"></label>
+        <label class="campo"><span>Número</span><input name="numero" autocomplete="off"></label>
+      </div>
+      <p class="sub" id="f-cep" aria-live="polite" style="margin:6px 0 0;font-size:13px">Digite o CEP que o app completa o endereço.</p>
       <label class="campo" style="margin-top:12px"><span>Endereço</span><input name="endereco" value="${esc(c?.endereco || '')}" autocomplete="off"></label>
-      <label class="campo" style="margin-top:12px"><span>Observações</span><textarea name="observacoes">${esc(c?.observacoes || '')}</textarea></label>`}
+      <label class="campo" style="margin-top:12px"><span>Observações</span><textarea name="observacoes">${esc(c?.observacoes || '')}</textarea></label>
+      </div>
       <button class="btn btn-primario btn-bloco" type="submit" style="margin-top:16px">Salvar cliente</button>
     </form>`);
-  caixa.querySelector('#f-cli').addEventListener('submit', async e => {
+  const form = caixa.querySelector('#f-cli'), extra = caixa.querySelector('#f-extra');
+  caixa.querySelector('#f-mais')?.addEventListener('click', e => { extra.hidden = false; e.currentTarget.remove(); form.elements.documento.focus(); });
+  ligarBuscaCnpj(form, caixa.querySelector('#f-cnpj'));
+  ligarBuscaCep(form, caixa.querySelector('#f-cep'));
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const d = lerForm(e.target);
     if (!d.nome) { avisar('Informe o nome', 'erro'); return; }
     const reg = { ...(c ? { id: c.id } : {}), nome: d.nome, whatsapp: d.whatsapp || '',
-      ...(rapido ? {} : { documento: d.documento || '', endereco: d.endereco || '', observacoes: d.observacoes || '' }) };
+      ...(extra.hidden ? {} : { documento: d.documento || '', endereco: d.endereco || '', observacoes: d.observacoes || '' }) };
     try {
       const salvo = c ? await atualizar('clientes', c.id, reg) : await salvar('clientes', reg);
       fecharModal(); avisar('Cliente salvo'); aoSalvar({ ...c, ...reg, ...salvo });
     } catch (err) { avisar(err.message, 'erro'); }
+  });
+}
+
+// Ao digitar um CNPJ completo, busca a empresa e preenche os campos vazios
+// (ou os que a busca anterior preencheu, se trocar de CNPJ). Nunca apaga o que você digitou.
+function ligarBuscaCnpj(form, aviso) {
+  const doc = form.elements.documento;
+  const auto = new Map();   // campo -> valor que a busca colocou
+  let ultimo = '', ctrl = null;
+  const por = (campo, valor) => {
+    const el = form.elements[campo];
+    if (!valor || !el) return false;
+    if (el.value.trim() && el.value !== auto.get(campo)) return false;
+    el.value = valor; auto.set(campo, valor); return true;
+  };
+  const dizer = (t, tipo = '') => { aviso.textContent = t; aviso.style.color = tipo === 'erro' ? 'var(--erro)' : tipo === 'ok' ? 'var(--ok)' : ''; };
+
+  doc.addEventListener('input', async () => {
+    const d = soDigitos(doc.value);
+    if (d.length !== 14) { ultimo = ''; if (d.length > 11) dizer('CNPJ tem 14 números.'); else dizer('Digite o CNPJ que o app preenche os dados da empresa.'); return; }
+    if (d === ultimo) return;
+    if (!cnpjValido(d)) { dizer('Esse CNPJ não existe. Confira os números.', 'erro'); return; }
+    ultimo = d; doc.value = formatarCnpj(d);
+    ctrl?.abort(); ctrl = new AbortController();
+    dizer('Buscando a empresa na Receita…');
+    try {
+      const emp = await buscarCnpj(d, ctrl.signal);
+      if (ultimo !== d) return;
+      const nome = emp.fantasia || emp.razao;
+      const celular = soDigitos(emp.telefone).length === 11 ? emp.telefone : '';
+      const obs = [emp.fantasia && emp.razao !== emp.fantasia && `Razão social: ${emp.razao}`,
+        emp.telefone && !celular && `Telefone: ${emp.telefone}`, emp.email && `E-mail: ${emp.email}`].filter(Boolean).join('\n');
+      const cepFmt = emp.cep?.length === 8 ? `${emp.cep.slice(0, 5)}-${emp.cep.slice(5)}` : '';
+      const mudou = [por('nome', nome), por('endereco', emp.endereco), por('cep', cepFmt), por('whatsapp', celular), por('observacoes', obs)].some(Boolean);
+      const parado = emp.situacao && emp.situacao !== 'Ativa' ? ` · Atenção: situação ${emp.situacao.toLowerCase()} na Receita` : '';
+      dizer(`✓ ${nome}${mudou ? '' : ' (os campos já estavam preenchidos, não mexi)'}${parado}`, parado ? 'erro' : 'ok');
+    } catch (err) {
+      if (err.name === 'AbortError' || ultimo !== d) return;
+      ultimo = '';
+      dizer(err.naoAchou ? 'CNPJ não encontrado na Receita.' : 'Não consegui buscar agora (sem internet?). Preencha à mão.', 'erro');
+    }
+  });
+}
+
+// Ao digitar um CEP completo, completa o endereço (rua, bairro, cidade). O número entra quando você digitar.
+function ligarBuscaCep(form, aviso) {
+  const { cep, numero, endereco } = form.elements;
+  let achado = null, auto = '', ultimo = '', ctrl = null;
+  const dizer = (t, tipo = '') => { aviso.textContent = t; aviso.style.color = tipo === 'erro' ? 'var(--erro)' : tipo === 'ok' ? 'var(--ok)' : ''; };
+  const montar = () => {
+    if (!achado || (endereco.value.trim() && endereco.value !== auto)) return false;
+    endereco.value = auto = linhaEndereco({ ...achado, numero: numero.value.trim() }); return true;
+  };
+  numero.addEventListener('input', montar);
+  cep.addEventListener('input', async () => {
+    const d = soDigitos(cep.value);
+    if (d.length !== 8) { ultimo = ''; achado = null; dizer('Digite o CEP que o app completa o endereço.'); return; }
+    if (d === ultimo) return;
+    ultimo = d; cep.value = `${d.slice(0, 5)}-${d.slice(5)}`;
+    ctrl?.abort(); ctrl = new AbortController();
+    dizer('Buscando o CEP…');
+    try {
+      const r = await buscarCep(d, ctrl.signal);
+      if (ultimo !== d) return;
+      achado = r;
+      const mudou = montar();
+      dizer(`✓ ${[r.logradouro, r.bairro, `${r.cidade}/${r.uf}`].filter(Boolean).join(' - ')}${mudou ? '' : ' (o endereço já estava preenchido, não mexi)'}`, 'ok');
+      if (mudou && !numero.value) numero.focus();
+    } catch (err) {
+      if (err.name === 'AbortError' || ultimo !== d) return;
+      ultimo = '';
+      dizer(err.naoAchou ? 'CEP não encontrado.' : 'Não consegui buscar agora (sem internet?). Preencha à mão.', 'erro');
+    }
   });
 }
 

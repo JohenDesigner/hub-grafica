@@ -1,10 +1,10 @@
 // Guarda os arquivos do app para abrir sem internet. Dados (Supabase) e catálogo do site não passam por aqui.
-const VERSAO = 'hub-v14';
+const VERSAO = 'hub-v15';
 const ARQUIVOS = [
   './', 'index.html', 'manifest.json', 'css/app.css',
   'img/logo-icone.webp', 'img/logo-wordmark.webp', 'icons/icon-192.png', 'icons/icon-512.png',
   'vendor/supabase.js', 'vendor/jspdf.umd.min.js', 'vendor/xlsx.full.min.js',
-  'js/app.js', 'js/calc.js', 'js/catalogo.js', 'js/config.js', 'js/conflito.js', 'js/db.js', 'js/exportar.js',
+  'js/app.js', 'js/calc.js', 'js/catalogo.js', 'js/cnpj.js', 'js/config.js', 'js/conflito.js', 'js/db.js', 'js/exportar.js',
   'js/formato.js', 'js/grafico.js', 'js/pdf.js', 'js/rotas.js', 'js/ui.js', 'js/whatsapp.js',
   'js/telas/clientes.js', 'js/telas/conversas.js', 'js/telas/desempenho.js', 'js/telas/balcao.js', 'js/telas/configuracoes.js', 'js/telas/inicio.js', 'js/telas/orcamento.js',
   'js/telas/pedidos.js', 'js/telas/produtos.js', 'js/telas/receber.js'
