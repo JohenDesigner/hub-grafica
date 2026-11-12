@@ -117,11 +117,12 @@ export async function montar(el, _p, vivo) {
       <a class="atalho laranja" href="#orcamento">Novo orçamento<small>calcula com os preços do site</small></a>
       <a class="atalho turquesa" href="#orcamento/novo-pedido">Novo pedido<small>já vira pedido ao salvar</small></a>
       <a class="atalho escuro" href="#balcao">Balcão<small>impressão e cópia rápida</small></a>
+      <a class="atalho azul" href="#historico">Histórico<small>tudo que foi pago, com a soma</small></a>
     </div>
     ${alertas.length ? `<section class="alertas" aria-label="Precisa de atenção">${alertas.map(([tipo, txt, href]) => `<a class="alerta-item ${tipo}" href="${href}"><span class="alerta-ponto" aria-hidden="true"></span><span>${esc(txt)}</span><span class="alerta-seta" aria-hidden="true">›</span></a>`).join('')}</section>` : ''}
     <div class="cabeca"><h2>Resumo</h2>
-      <div class="resumo-acoes"><button type="button" class="btn btn-peq" id="r-historico">Histórico</button><button type="button" class="btn btn-peq" id="r-zerar">Zerar resumo</button></div></div>
-    ${desde ? `<p class="sub resumo-desde">Contando desde ${esc(new Date(desde).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }))} (zerado). O que veio antes está no Histórico.</p>` : ''}
+      <div class="resumo-acoes"><button type="button" class="btn btn-peq" id="r-historico">Resumos anteriores</button><button type="button" class="btn btn-peq" id="r-zerar">Zerar resumo</button></div></div>
+    ${desde ? `<p class="sub resumo-desde">Contando desde ${esc(new Date(desde).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }))} (zerado). O que veio antes está em Resumos anteriores.</p>` : ''}
     <div class="cabeca"><div class="segmentado painel-periodo" role="group" aria-label="Período">${PERIODOS.map(([k, n]) => `<button type="button" data-per="${k}" aria-pressed="${k === periodo}">${n}</button>`).join('')}</div></div>
     <div id="painel"></div>
     <a class="btn btn-bloco" href="#desempenho">Ver gráficos de desempenho</a>

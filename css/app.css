@@ -307,8 +307,8 @@ svg{display:block}
 .comprovantes .sub{margin:0}
 /* balcão */
 .atalho.escuro{background:linear-gradient(135deg,#2b3236,#4a5359)}
-.atalhos .atalho.escuro{grid-column:1/-1;min-height:72px}
-@media (min-width:900px){.atalhos .atalho.escuro{grid-column:auto;min-height:96px}}
+.atalhos .atalho.escuro{min-height:96px}
+
 .bal-grade{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .bal-btn{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:6px;min-height:88px;padding:14px;border-radius:var(--raio);border:2px solid var(--linha);background:var(--cartao);color:var(--texto);text-align:left;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .bal-btn:active{transform:scale(.97)}
@@ -410,3 +410,10 @@ body.com-painel{overflow:hidden}
   .cad-acoes .btn-perigo{grid-column:auto;margin-right:auto}
 }
 @media (max-width:699px){.cad-linha{grid-template-columns:1fr 92px}}
+/* histórico: soma presa no rodapé */
+.h-soma{position:sticky;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px);z-index:5;margin-top:16px;padding:12px 16px;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+.h-soma-linha{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-weight:700;font-size:17px}
+.h-soma-linha .valor{font-family:var(--display);font-size:22px}
+.h-soma-formas{font-size:13px;margin-top:2px}
+@media (min-width:900px){.h-soma{bottom:12px}}
+.atalho.azul{background:linear-gradient(135deg,var(--azul),#1f7f96)}

@@ -500,9 +500,47 @@ try {
   ok((await texto('.gr .graf-dica')).includes('Vendido'), 'tocar na coluna mostra os valores');
   await print('18-desempenho');
 
+  console.log('Histórico (tudo que foi pago)');
+  await pg.goto(BASE + '#inicio'); await pg.click('.atalho[href="#historico"]'); await pg.waitForSelector('#h-lista');
+  await pg.click('#h-per [data-v=tudo]');
+  const banco = await pg.evaluate(() => window.__mock.banco().t);
+  const esperado = banco.pagamentos.reduce((s, p) => s + p.valor_centavos, 0) + banco.vendas_balcao.reduce((s, v) => s + v.total_centavos, 0);
+  ok(await pg.locator('#h-lista .lista-item').count() === banco.pagamentos.length + banco.vendas_balcao.length, 'lista tem cada pagamento, sinal e venda do balcão');
+  const moedaBR = c => 'R$ ' + (c / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  ok((await texto('#h-total')) === moedaBR(esperado), 'rodapé soma tudo que foi pago');
+  ok((await texto('#h-lista')).includes('Sinal'), 'sinal aparece no histórico');
+  await print('30-historico');
+  await pg.click('#h-tipo [data-v=balcao]');
+  ok((await texto('#h-total')) === moedaBR(banco.vendas_balcao.reduce((s, v) => s + v.total_centavos, 0)), 'filtro Balcão soma só o balcão');
+  // editar uma venda do balcão
+  await pg.locator('#h-lista .lista-item').first().click(); await pg.waitForSelector('#f-reg');
+  await pg.fill('#f-reg [name=valor]', '7,25'); await pg.click('#er-forma [data-forma=pix]');
+  await print('31-historico-editar');
+  await pg.click('#f-reg [type=submit]'); await esperar(500);
+  ok((await texto('#h-lista')).includes('R$ 7,25') && (await texto('#h-lista')).includes('Pix'), 'editar venda do balcão muda valor e forma');
+  // editar um pagamento: não deixa passar do valor do pedido
+  await pg.click('#h-tipo [data-v=todos]'); await pg.click('#h-tipo [data-v=sinal]');
+  await pg.locator('#h-lista .lista-item').first().click(); await pg.waitForSelector('#f-reg');
+  await pg.fill('#f-reg [name=valor]', '99999'); await pg.click('#f-reg [type=submit]'); await esperar(300);
+  ok(await pg.locator('#f-reg').isVisible() && (await texto('#toast')).includes('maior'), 'pagamento não pode passar do valor do pedido');
+  await pg.fill('#f-reg [name=valor]', '10'); await pg.click('#f-reg [type=submit]'); await esperar(500);
+  ok((await texto('#h-lista')).includes('R$ 10,00'), 'editar sinal salva o valor novo');
+  // excluir
+  await pg.click('#h-tipo [data-v=balcao]');
+  const antesExc = await pg.locator('#h-lista .lista-item').count();
+  await pg.locator('#h-lista .lista-item').first().click(); await pg.waitForSelector('#er-excluir');
+  await pg.click('#er-excluir'); await pg.click('#modal [data-ok]'); await esperar(500);
+  ok(await pg.locator('#h-lista .lista-item').count() === antesExc - 1, 'excluir tira a entrada da lista');
+  await pg.click('#h-tipo [data-v=todos]');
+  await pg.fill('#h-busca', 'ana');
+  ok((await texto('#h-lista')).includes('Ana Souza') && !(await texto('#h-lista')).includes('Balcão'), 'busca por cliente');
+  await pg.goto(BASE + '#inicio'); await pg.goto(BASE + '#historico'); await pg.waitForSelector('#h-lista');
+  ok(await pg.inputValue('#h-busca') === 'ana', 'filtros ficam lembrados ao voltar');
+  await pg.fill('#h-busca', ''); await pg.dispatchEvent('#h-busca', 'input');
+
   console.log('PC (1280 px)');
   await pg.setViewportSize({ width: 1280, height: 800 });
-  for (const t of ['inicio', 'pedidos', 'orcamento', 'clientes', 'receber', 'produtos', 'conversas', 'conversa/' + cliWa, 'desempenho', 'balcao']) {
+  for (const t of ['inicio', 'pedidos', 'orcamento', 'clientes', 'receber', 'historico', 'produtos', 'conversas', 'conversa/' + cliWa, 'desempenho', 'balcao']) {
     await pg.goto(BASE + '#' + t); await esperar(500); await print(`pc-${t}`);
   }
   ok(await pg.evaluate(() => getComputedStyle(document.getElementById('nav')).width === '220px'), 'no PC a navegação vira lateral');

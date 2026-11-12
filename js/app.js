@@ -6,6 +6,7 @@ import * as inicio from './telas/inicio.js';
 import * as orcamento from './telas/orcamento.js';
 import * as pedidos from './telas/pedidos.js';
 import * as clientes from './telas/clientes.js';
+import * as historico from './telas/historico.js';
 import * as receber from './telas/receber.js';
 import * as produtos from './telas/produtos.js';
 import * as configuracoes from './telas/configuracoes.js';
@@ -20,6 +21,7 @@ registrar('pedido', { montar: pedidos.montarDetalhe });
 registrar('clientes', { montar: clientes.montarLista });
 registrar('cliente', { montar: clientes.montarDetalhe });
 registrar('receber', { montar: receber.montar });
+registrar('historico', { montar: historico.montar });
 registrar('produtos', { montar: produtos.montar });
 registrar('mais', { montar: configuracoes.montarMais });
 registrar('configuracoes', { montar: configuracoes.montar });
@@ -48,7 +50,7 @@ function fecharPainelBalcao() {
 }
 function ajustarFab() {
   const rota = (location.hash.slice(1) || 'inicio').split('/')[0];
-  document.getElementById('fab-balcao').hidden = rota === 'balcao' || !document.getElementById('painel-balcao').hidden;
+  document.getElementById('fab-balcao').hidden = rota === 'balcao' || rota === 'historico' || !document.getElementById('painel-balcao').hidden;
 }
 function ligarBalcao() {
   document.getElementById('fab-balcao').addEventListener('click', abrirPainelBalcao);

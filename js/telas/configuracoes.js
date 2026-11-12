@@ -154,6 +154,7 @@ export async function montarMais(el) {
   el.innerHTML = `<ul class="lista">
     ${item('#balcao', 'Balcão', 'Impressões e cópias rápidas, sem cliente')}
     ${item('#desempenho', 'Desempenho', 'Gráficos de vendas, pedidos, clientes e WhatsApp')}
+    ${item('#historico', 'Histórico', 'Tudo que foi pago: sinais, pagamentos e balcão')}
     ${item('#receber', 'A receber', 'Quem deve e quanto, registrar pagamento')}
     ${item('#produtos', 'Produtos e preços', 'Catálogo do site e criar produto novo')}
     ${item('#pedidos/lixeira', 'Lixeira', 'Pedidos excluídos nos últimos 30 dias')}
