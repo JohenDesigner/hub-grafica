@@ -20,6 +20,25 @@ function imagemPng(src) {
   });
 }
 
+// Marca d'água: a imagem clarinha sobre fundo branco, em JPEG pequeno (deixa o PDF leve para o WhatsApp).
+function imagemMarca(src, opacidade = 0.07, maximo = 700) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, maximo / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.globalAlpha = opacidade;
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      resolve({ url: c.toDataURL('image/jpeg', 0.85), w: c.width, h: c.height });
+    };
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
 const limpo = t => String(t ?? '').replace(/−/g, '-').replace(/[^\u0000-ÿ–—•…]/g, '');
 
 export async function pdfOrcamento(ficha, cliente, cfg) {
@@ -28,6 +47,16 @@ export async function pdfOrcamento(ficha, cliente, cfg) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const M = 15, L = 210 - 2 * M;
   let y = M;
+
+  // Marca d'água: a logo grande e bem clarinha no meio de cada página, desenhada antes de tudo para ficar no fundo.
+  const marca = await imagemMarca(cfg.logo || 'img/logo-icone.webp');
+  const desenharMarca = () => {
+    if (!marca) return;
+    const w = Math.min(130, 130 * marca.w / marca.h), h = w * marca.h / marca.w;
+    doc.addImage(marca.url, 'JPEG', (210 - w) / 2, (297 - h) / 2 + 10, w, h, 'marca', 'FAST');
+  };
+  const novaPagina = () => { doc.addPage(); desenharMarca(); };
+  desenharMarca();
 
   const logo = await imagemPng(cfg.logo || 'img/logo-wordmark.webp');
   if (logo) { const h = 16, w = Math.min(60, h * logo.w / logo.h); doc.addImage(logo.url, 'PNG', M, y, w, h); }
@@ -63,7 +92,7 @@ export async function pdfOrcamento(ficha, cliente, cfg) {
     const desc = doc.splitTextToSize(limpo(it.nome), L - 16 - 32);
     const det = detalheItem(it) ? doc.splitTextToSize(limpo(detalheItem(it)), L - 16 - 32) : [];
     const altura = desc.length * 4.8 + det.length * 4.2 + 4;
-    if (y + altura > 270) { doc.addPage(); y = M + 5; cabeca(); }
+    if (y + altura > 270) { novaPagina(); y = M + 5; cabeca(); }
     doc.setFontSize(10.5); doc.setTextColor(...TINTA);
     doc.text(String(it.quantidade), cQtd + 2, y);
     desc.forEach((l, i) => doc.text(l, cDesc, y + i * 4.8));
@@ -76,7 +105,7 @@ export async function pdfOrcamento(ficha, cliente, cfg) {
   }
 
   // totais
-  if (y > 230) { doc.addPage(); y = M + 5; }
+  if (y > 230) { novaPagina(); y = M + 5; }
   const r = calcularFicha(ficha.itens, ficha.desconto);
   y += 2; doc.setFontSize(10.5); doc.setTextColor(...CINZA);
   if (r.desconto) {
@@ -100,7 +129,7 @@ export async function pdfOrcamento(ficha, cliente, cfg) {
   cond.forEach(([a, b]) => { doc.setFont('helvetica', 'bold'); doc.text(limpo(a + ':'), M, y); doc.setFont('helvetica', 'normal'); doc.text(limpo(b), M + 42, y); y += 6; });
   if (ficha.observacoes) {
     y += 2; doc.setFont('helvetica', 'bold'); doc.text('Observações:', M, y); y += 5; doc.setFont('helvetica', 'normal');
-    doc.splitTextToSize(limpo(ficha.observacoes), L).forEach(l => { if (y > 280) { doc.addPage(); y = M + 5; } doc.text(l, M, y); y += 5; });
+    doc.splitTextToSize(limpo(ficha.observacoes), L).forEach(l => { if (y > 280) { novaPagina(); y = M + 5; } doc.text(l, M, y); y += 5; });
   }
 
   const paginas = doc.getNumberOfPages();
