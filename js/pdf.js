@@ -6,14 +6,19 @@ import { carregarScript } from './ui.js';
 
 const LARANJA = [232, 101, 10], TINTA = [34, 41, 44], CINZA = [98, 109, 113], LINHA = [235, 232, 227];
 
-function imagemPng(src) {
+// Logo do topo. Reduz para no máximo 'alturaMax' px de altura: no PDF ela tem 16 mm,
+// então 300 px dá ~475 dpi (nítida na impressão) e deixa o arquivo leve para o WhatsApp.
+function imagemPng(src, alturaMax = 300) {
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
+      const k = Math.min(1, alturaMax / img.naturalHeight);
       const c = document.createElement('canvas');
-      c.width = img.naturalWidth; c.height = img.naturalHeight;
-      c.getContext('2d').drawImage(img, 0, 0);
-      resolve({ url: c.toDataURL('image/png'), w: img.naturalWidth, h: img.naturalHeight });
+      c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      resolve({ url: c.toDataURL('image/png'), w: c.width, h: c.height });
     };
     img.onerror = () => resolve(null);
     img.src = src;
@@ -39,6 +44,18 @@ function imagemMarca(src, opacidade = 0.07, maximo = 700) {
   });
 }
 
+// Condições gerais impressas no pé do orçamento. Curtas de propósito: uma ideia por linha.
+const CLAUSULAS = cfg => [
+  ['Aprovação da arte', 'A produção só começa após sua aprovação. Confira com atenção nomes, telefones, datas, valores e ortografia: erros não apontados na aprovação são de responsabilidade do cliente e a correção depois de impresso é cobrada.'],
+  ['Cores', 'Imprimimos em CMYK: as cores podem variar em relação à tela (RGB), entre materiais e entre tiragens.'],
+  ['Artes com I.A.', 'Imagens criadas por inteligência artificial podem ter defeitos (textos, mãos, rostos) e baixa resolução. Não garantimos sua qualidade de impressão nem os direitos de uso.'],
+  ['Arquivo do cliente', 'Arquivos enviados prontos são impressos como recebidos. Envie em PDF, 300 dpi, com textos em curvas e 3 mm de sangria.'],
+  ['Prazo', 'Conta em dias úteis a partir da aprovação da arte e do pagamento do sinal.'],
+  ['Corte e refile', 'Variações de até 2 mm são normais do processo.'],
+  ['Retirada', `O produto fica guardado por até ${cfg.retirada_meses || 3} meses após o aviso de pronto. Depois disso pode ser descartado, sem reembolso.`],
+  ['Cancelamento', 'Depois da aprovação da arte e do início da produção, o sinal não é devolvido.']
+];
+
 const limpo = t => String(t ?? '').replace(/−/g, '-').replace(/[^\u0000-ÿ–—•…]/g, '');
 
 export async function pdfOrcamento(ficha, cliente, cfg) {
@@ -59,7 +76,7 @@ export async function pdfOrcamento(ficha, cliente, cfg) {
   desenharMarca();
 
   const logo = await imagemPng(cfg.logo || 'img/logo-wordmark.webp');
-  if (logo) { const h = 16, w = Math.min(60, h * logo.w / logo.h); doc.addImage(logo.url, 'PNG', M, y, w, h); }
+  if (logo) { const h = 16, w = Math.min(60, h * logo.w / logo.h); doc.addImage(logo.url, 'PNG', M, y, w, h, 'logo', 'FAST'); }
   doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...CINZA);
   const dados = [cfg.nome, cfg.cnpj && `CNPJ ${cfg.cnpj}`, cfg.endereco, [cfg.whatsapp && `WhatsApp ${cfg.whatsapp}`, cfg.instagram].filter(Boolean).join(' · ')].filter(Boolean);
   dados.forEach((t, i) => doc.text(limpo(t), 210 - M, y + 3 + i * 4.2, { align: 'right' }));
@@ -131,6 +148,24 @@ export async function pdfOrcamento(ficha, cliente, cfg) {
     y += 2; doc.setFont('helvetica', 'bold'); doc.text('Observações:', M, y); y += 5; doc.setFont('helvetica', 'normal');
     doc.splitTextToSize(limpo(ficha.observacoes), L).forEach(l => { if (y > 280) { novaPagina(); y = M + 5; } doc.text(l, M, y); y += 5; });
   }
+
+  // condições gerais: letra pequena, presa ao pé da última página (ou numa página nova se não couber)
+  const cl = CLAUSULAS(cfg), colT = 31, larg = L - colT;
+  doc.setFontSize(7.5);
+  const linhas = cl.map(([, t]) => doc.splitTextToSize(limpo(t), larg));
+  const alturaCl = 9 + linhas.reduce((s, l) => s + l.length * 3.3 + 1.4, 0);
+  if (y + 8 + alturaCl > 284) { novaPagina(); y = M + 5; }
+  y = Math.max(y + 8, 284 - alturaCl);
+  doc.setDrawColor(...LINHA); doc.setLineWidth(0.3); doc.line(M, y, 210 - M, y); y += 5;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...TINTA);
+  doc.text('CONDIÇÕES GERAIS', M, y); y += 4.5;
+  doc.setFontSize(7.5);
+  cl.forEach(([titulo], i) => {
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(...TINTA); doc.text(limpo(titulo), M, y);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(...CINZA);
+    linhas[i].forEach((l, j) => doc.text(l, M + colT, y + j * 3.3));
+    y += linhas[i].length * 3.3 + 1.4;
+  });
 
   const paginas = doc.getNumberOfPages();
   for (let p = 1; p <= paginas; p++) {
