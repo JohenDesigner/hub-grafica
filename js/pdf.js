@@ -58,7 +58,8 @@ const CLAUSULAS = cfg => [
 
 const limpo = t => String(t ?? '').replace(/−/g, '-').replace(/[^\u0000-ÿ–—•…]/g, '');
 
-export async function pdfOrcamento(ficha, cliente, cfg) {
+// baixar: true salva o arquivo no aparelho; false só devolve o arquivo (para compartilhar no WhatsApp).
+export async function pdfOrcamento(ficha, cliente, cfg, { baixar = true } = {}) {
   await carregarScript('vendor/jspdf.umd.min.js');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -175,6 +176,6 @@ export async function pdfOrcamento(ficha, cliente, cfg) {
   }
 
   const nomeArq = `orcamento-${ficha.numero ?? 'novo'}-${String(cliente.nome).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()}.pdf`;
-  doc.save(nomeArq);
-  return nomeArq;
+  if (baixar) doc.save(nomeArq);
+  return { nome: nomeArq, blob: doc.output('blob') };
 }

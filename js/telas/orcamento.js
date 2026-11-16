@@ -142,7 +142,8 @@ export async function montar(el, param, vivo) {
       <section class="cartao" id="o-depois">
         <h3>Orçamento nº ${esc(ficha.numero ?? 'novo')}${ficha._pendente ? ' <span class="selo alerta">pendente de envio</span>' : ''}</h3>
         <div class="botoes">
-          ${cliente?.whatsapp ? `<a class="btn btn-wpp" id="o-wpp" target="_blank" rel="noopener" href="#">Enviar no WhatsApp</a>` : '<span class="sub">Cadastre o WhatsApp do cliente para enviar.</span>'}
+          ${cliente?.whatsapp ? `<button class="btn btn-wpp" id="o-wpp-pdf">Enviar PDF + mensagem no WhatsApp</button>
+          <a class="btn btn-wpp" id="o-wpp" target="_blank" rel="noopener" href="#">Só a mensagem</a>` : '<span class="sub">Cadastre o WhatsApp do cliente para enviar.</span>'}
           <button class="btn" id="o-pdf">Gerar PDF</button>
         </div>
         <button class="btn btn-bloco" id="o-virar">Virar pedido</button>
@@ -226,6 +227,12 @@ export async function montar(el, param, vivo) {
       if (!salvo && !(await gravar({ silencioso: true }))) return;
       window.open(linkWa(cliente.whatsapp, mensagem('orcamento', { ficha, cliente, cfg })), '_blank', 'noopener');
     });
+    q('#o-wpp-pdf')?.addEventListener('click', async e => {
+      if (!salvo && !(await gravar({ silencioso: true }))) return;
+      const btn = e.currentTarget; btn.disabled = true;
+      try { await enviarPdfWhatsapp(); } catch (err) { avisar(err.message, 'erro'); }
+      btn.disabled = false;
+    });
     q('#o-pdf')?.addEventListener('click', async e => {
       if (!salvo && !(await gravar({ silencioso: true }))) return;
       e.target.disabled = true;
@@ -236,6 +243,39 @@ export async function montar(el, param, vivo) {
       if (!salvo && !(await gravar({ silencioso: true }))) return;
       virarPedido();
     });
+  }
+
+  // PDF + mensagem juntos. O link wa.me não aceita anexo, então usa o "Compartilhar" do aparelho
+  // (celular e Chrome do Windows): escolhe WhatsApp → cliente, e o texto vai junto com o PDF.
+  // Onde não houver "Compartilhar", baixa o PDF e abre a conversa com a mensagem pronta para anexar.
+  async function enviarPdfWhatsapp() {
+    const texto = mensagem('orcamento', { ficha, cliente, cfg });
+    const { nome, blob } = await pdfOrcamento(ficha, cliente, cfg, { baixar: false });
+    const arquivo = new File([blob], nome, { type: 'application/pdf' });
+    const dados = { files: [arquivo], text: texto, title: nome };
+    if (navigator.canShare?.(dados)) {
+      try { await navigator.share(dados); return; }
+      catch (err) {
+        if (err.name === 'AbortError') return; // fechou a janela de compartilhar
+        if (err.name !== 'NotAllowedError') throw err;
+        // demorou para gerar e o navegador pediu um novo toque: oferece o botão de novo
+        const caixa = abrirModal(`
+          <p style="font-size:17px;margin:0">O PDF do orçamento nº ${esc(ficha.numero ?? '')} está pronto.</p>
+          <p class="sub">Toque em Compartilhar e escolha WhatsApp → ${esc(cliente.nome)}.</p>
+          <div class="botoes"><button class="btn" data-fechar>Cancelar</button><button class="btn btn-wpp" data-ok>Compartilhar</button></div>`);
+        caixa.querySelector('[data-ok]').addEventListener('click', async () => {
+          fecharModal();
+          try { await navigator.share(dados); } catch (e2) { if (e2.name !== 'AbortError') avisar(e2.message, 'erro'); }
+        });
+        return;
+      }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: nome });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    window.open(linkWa(cliente.whatsapp, texto), '_blank', 'noopener');
+    avisar('PDF baixado. No WhatsApp, toque no clipe → Documento para anexar.');
   }
 
   function novoCliente(nome) {

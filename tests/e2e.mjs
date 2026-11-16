@@ -154,6 +154,12 @@ try {
   });
   const msg = decodeURIComponent(href.split('text=')[1] || '');
   ok(href.startsWith('https://wa.me/5511988887777') && msg.includes('Olá, Ana!') && msg.includes('Total: R$ 220,50') && msg.includes('100×60 cm'), 'mensagem de WhatsApp montada certo');
+  const comp = await pg.evaluate(() => {
+    let dados = null; navigator.canShare = () => true; navigator.share = async d => { dados = d; };
+    document.querySelector('#o-wpp-pdf').click();
+    return new Promise(r => { const t = setInterval(() => { if (dados) { clearInterval(t); r({ nome: dados.files[0].name, tipo: dados.files[0].type, tam: dados.files[0].size, texto: dados.text }); } }, 100); setTimeout(() => r(null), 8000); });
+  });
+  ok(comp?.nome === 'orcamento-1-ana-souza.pdf' && comp.tipo === 'application/pdf' && comp.tam > 3000 && comp.texto.includes('Total: R$ 220,50'), 'botão WhatsApp + PDF compartilha o PDF junto com a mensagem');
   const [dl] = await Promise.all([pg.waitForEvent('download'), pg.click('#o-pdf')]);
   const arq = path.join(PRINTS, dl.suggestedFilename()); await dl.saveAs(arq);
   ok(dl.suggestedFilename() === 'orcamento-1-ana-souza.pdf' && fs.statSync(arq).size > 3000, 'PDF do orçamento gerado');
