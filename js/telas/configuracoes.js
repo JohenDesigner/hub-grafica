@@ -11,19 +11,20 @@ export const PADRAO_CFG = {
   whatsapp: '(11) 98287-7142',
   instagram: '@johen_artgrafica',
   horario: 'segunda a sábado, das 11h às 20h',
-  pix: '65.480.613/0001-19',
+  pix: 'johenartegrafica@gmail.com',
+  recebedor: 'JOSÉ HENRIQUE',
   logo: '',
   validade_dias: 7,
   textos: {},
   respostas: null   // respostas prontas das Conversas (null = usa as padrão)
 };
 
-// Respostas prontas da tela de Conversas. Marcadores: {cliente} {pix} {endereco} {horario} {grafica}
+// Respostas prontas da tela de Conversas. Marcadores: {cliente} {pix} {recebedor} {endereco} {horario} {grafica}
 export const RESPOSTAS_PADRAO = [
   { titulo: 'Recebi', texto: 'Oi, {cliente}! Recebi sim, já estou vendo aqui e te mando o orçamento em instantes. 😊' },
   { titulo: 'Mandar a arte', texto: 'Pode me mandar a arte aqui mesmo (PDF, PNG ou CorelDRAW). Se não tiver arte, a gente cria pra você! 🎨' },
   { titulo: 'Sinal', texto: 'Pra começar a produção, trabalhamos com 50% de sinal e o restante na retirada. Pode ser?' },
-  { titulo: 'Pix', texto: 'Segue a chave Pix (CNPJ): {pix}\n{grafica}\n\nDepois me manda o comprovante aqui, por favor! 🙏' },
+  { titulo: 'Pix', texto: 'Segue a chave Pix (e-mail): {pix}\nRecebedor: {recebedor}. Confere esse nome antes de pagar, tá?\n\nO sinal é de 50% do valor. Depois me manda o comprovante do sinal aqui, por favor! 🙏' },
   { titulo: 'Prazo', texto: 'O prazo de produção começa a contar depois da arte aprovada e do sinal. Assim que ficar pronto eu te aviso por aqui!' },
   { titulo: 'Arte pra aprovar', texto: '{cliente}, a arte está pronta! Confere com calma e me diz se posso mandar pra produção ou se quer mudar alguma coisa.' },
   { titulo: 'Pronto', texto: '{cliente}, seu pedido está pronto! 🎉 Pode retirar na loja: {endereco}, {horario}.' },
@@ -58,7 +59,7 @@ export async function carregarCfg() {
 }
 
 const NOMES_TEXTO = { orcamento: 'Orçamento', arte: 'Arte para aprovar', pronto: 'Pedido pronto', cobranca: 'Cobrança' };
-const MARCADORES = '{cliente} {numero} {itens} {total} {prazo} {validade} {pix} {endereco} {horario} {saldo} {grafica}';
+const MARCADORES = '{cliente} {numero} {itens} {total} {sinal} {prazo} {validade} {pix} {recebedor} {endereco} {horario} {saldo} {grafica}';
 
 export async function montar(el) {
   titulo('Configurações');
@@ -76,6 +77,7 @@ export async function montar(el) {
       <div class="grade-2">
         <label class="campo"><span>Instagram</span><input name="instagram" value="${esc(cfg.instagram)}"></label>
         <label class="campo"><span>Chave Pix</span><input name="pix" value="${esc(cfg.pix)}"></label>
+        <label class="campo"><span>Nome do recebedor do Pix</span><input name="recebedor" value="${esc(cfg.recebedor)}"></label>
       </div>
       <label class="campo"><span>Horário</span><input name="horario" value="${esc(cfg.horario)}"></label>
       <label class="campo"><span>Validade do orçamento (dias)</span><input name="validade_dias" type="number" min="1" max="90" value="${esc(cfg.validade_dias)}" inputmode="numeric"></label>
@@ -126,7 +128,7 @@ export async function montar(el) {
     const anterior = await carregarCfg();
     const { respostas, ia_auto, balcao } = anterior;
     const dados = { ...(respostas ? { respostas } : {}), ...(ia_auto === false ? { ia_auto } : {}), ...(balcao ? { balcao } : {}), nome: d.nome, cnpj: d.cnpj, whatsapp: d.whatsapp, endereco: d.endereco, instagram: d.instagram,
-      pix: d.pix, horario: d.horario, validade_dias: Math.max(1, parseInt(d.validade_dias, 10) || 7), logo, textos };
+      pix: d.pix, recebedor: d.recebedor, horario: d.horario, validade_dias: Math.max(1, parseInt(d.validade_dias, 10) || 7), logo, textos };
     const btn = e.target.querySelector('[type=submit]'); btn.disabled = true;
     try {
       const u = await usuarioAtual();

@@ -18,10 +18,10 @@ const linhaItem = it => {
 const trocar = (t, v) => t.replace(/\{(\w+)\}/g, (_, k) => v[k] ?? '');
 
 export const PADRAO = {
-  orcamento: 'Olá, {cliente}! Segue o orçamento nº {numero} da {grafica}:\n\n{itens}\n\nTotal: {total}\nPrazo: {prazo}\nVálido até: {validade}\n\nPix: {pix}',
+  orcamento: 'Olá, {cliente}! Segue o orçamento nº {numero} da {grafica}:\n\n{itens}\n\nTotal: {total}\nSinal (50%): {sinal}\nPrazo: {prazo}\nVálido até: {validade}\n\nPix (e-mail): {pix}\nRecebedor: {recebedor}. Confira o nome antes de pagar.\n\nPra começar a produção, me mande aqui o comprovante do sinal de 50%.',
   arte: 'Olá, {cliente}! A arte do pedido nº {numero} está pronta. Pode conferir e me dizer se aprova?',
   pronto: 'Olá, {cliente}! Seu pedido nº {numero} está pronto para retirada na {grafica}, {endereco}. Horário: {horario}.{falta}',
-  cobranca: 'Olá, {cliente}! Consta em aberto {saldo} do pedido nº {numero}. Pix: {pix}. Obrigado!'
+  cobranca: 'Olá, {cliente}! Consta em aberto {saldo} do pedido nº {numero}. Pix (e-mail): {pix}. Recebedor: {recebedor}, confira o nome antes de pagar. Depois me mande o comprovante aqui. Obrigado!'
 };
 
 export function mensagem(tipo, { ficha, cliente, cfg = {}, saldo = 0 }) {
@@ -33,9 +33,11 @@ export function mensagem(tipo, { ficha, cliente, cfg = {}, saldo = 0 }) {
     grafica: cfg.nome || 'Johen Arte Grafica',
     itens: (ficha.itens || []).map(linhaItem).join('\n'),
     total: moeda(ficha.total_centavos),
+    sinal: moeda(Math.round((ficha.total_centavos || 0) / 2)),
     prazo: ficha.prazo ? data(ficha.prazo) : 'a combinar',
     validade: data(validade.toISOString()),
     pix: cfg.pix || '',
+    recebedor: cfg.recebedor || 'JOSÉ HENRIQUE',
     endereco: cfg.endereco || '',
     horario: cfg.horario || '',
     saldo: moeda(saldo),

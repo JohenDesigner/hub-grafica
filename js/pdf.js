@@ -142,7 +142,9 @@ export async function pdfOrcamento(ficha, cliente, cfg, { baixar = true } = {}) 
     ['Prazo de entrega', ficha.prazo ? data(ficha.prazo) : 'a combinar'],
     ['Válido até', data(validade)],
     ['Formas de pagamento', 'Pix, cartão de débito, cartão de crédito ou dinheiro'],
-    cfg.pix && ['Chave Pix', cfg.pix]
+    cfg.pix && ['Chave Pix', cfg.pix],
+    cfg.pix && ['Recebedor', cfg.recebedor || 'JOSÉ HENRIQUE'],
+    ['Sinal', '50% para iniciar a produção (envie o comprovante no WhatsApp)']
   ].filter(Boolean);
   cond.forEach(([a, b]) => { doc.setFont('helvetica', 'bold'); doc.text(limpo(a + ':'), M, y); doc.setFont('helvetica', 'normal'); doc.text(limpo(b), M + 42, y); y += 6; });
   if (ficha.observacoes) {

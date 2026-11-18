@@ -38,7 +38,7 @@ function editarRespostas(lista, aoSalvar) {
   const desenhar = () => {
     area.innerHTML = `
       <div class="modal-topo"><h2>Respostas prontas</h2><button class="icone-btn" data-fechar-rp aria-label="Fechar">${ICONE.fechar}</button></div>
-      <p class="sub">Marcadores que viram dado de verdade: {cliente} {pix} {endereco} {horario} {grafica}</p>
+      <p class="sub">Marcadores que viram dado de verdade: {cliente} {pix} {recebedor} {endereco} {horario} {grafica}</p>
       ${itens.map((r, i) => `<div class="cartao rp-item">
         <div class="campo-linha"><label class="campo"><span>Nome do botão</span><input data-i="${i}" data-c="titulo" value="${esc(r.titulo)}" maxlength="24"></label>
         <button class="icone-btn" type="button" data-rem="${i}" aria-label="Apagar resposta">${ICONE.lixo}</button></div>
@@ -192,7 +192,7 @@ export async function montarConversa(el, clienteId, vivo) {
   const cfg = await carregarCfg();
   if (!vivo()) return;
   let respostas = Array.isArray(cfg.respostas) ? cfg.respostas : RESPOSTAS_PADRAO;
-  const valores = () => ({ cliente: (cliente.nome || '').split(' ')[0], pix: cfg.pix || '', endereco: cfg.endereco || '', horario: cfg.horario || '', grafica: cfg.nome || 'Johen Arte Grafica' });
+  const valores = () => ({ cliente: (cliente.nome || '').split(' ')[0], pix: cfg.pix || '', recebedor: cfg.recebedor || 'JOSÉ HENRIQUE', endereco: cfg.endereco || '', horario: cfg.horario || '', grafica: cfg.nome || 'Johen Arte Grafica' });
 
   async function sugerirIA(b) {
     b.disabled = true; const antes = b.textContent; b.textContent = '✨ Pensando…';
