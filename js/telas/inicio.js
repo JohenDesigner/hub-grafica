@@ -105,7 +105,7 @@ export async function montar(el, _p, vivo) {
     naoLidas && ['wpp', `${naoLidas} ${naoLidas === 1 ? 'mensagem não lida' : 'mensagens não lidas'} no WhatsApp`, '#conversas'],
     doSite.length && ['wpp', `${doSite.length} ${doSite.length === 1 ? 'pedido novo do site' : 'pedidos novos do site'} para conferir`, doSite.length === 1 ? `#pedido/${doSite[0].id}` : '#pedidos/orcamento'],
     comComprovante.length && ['alerta', `${comComprovante.length} ${comComprovante.length === 1 ? 'comprovante de pagamento' : 'comprovantes de pagamento'} para conferir`, comComprovante.length === 1 ? `#pedido/${comComprovante[0].id}` : '#receber'],
-    atrasados.length && ['erro', `${atrasados.length} ${atrasados.length === 1 ? 'pedido atrasado' : 'pedidos atrasados'}`, atrasados.length === 1 ? `#pedido/${atrasados[0].id}` : '#pedidos'],
+    atrasados.length && ['erro', `${atrasados.length} ${atrasados.length === 1 ? 'pedido atrasado' : 'pedidos atrasados'}`, atrasados.length === 1 ? `#pedido/${atrasados[0].id}` : '#pedidos/atrasados'],
     orcSemValor.length && ['alerta', `${orcSemValor.length} ${orcSemValor.length === 1 ? 'orçamento esperando' : 'orçamentos esperando'} você montar`, orcSemValor.length === 1 ? `#orcamento/${orcSemValor[0].id}` : '#pedidos/orcamento'],
     prontosParados.length && ['alerta', `${prontosParados.length} ${prontosParados.length === 1 ? 'pedido pronto' : 'pedidos prontos'} há mais de 3 dias sem retirada`, '#pedidos/pronto'],
     orcParados.length && ['info', `${orcParados.length} ${orcParados.length === 1 ? 'orçamento enviado' : 'orçamentos enviados'} há mais de 2 dias sem resposta`, '#pedidos/orcamento']

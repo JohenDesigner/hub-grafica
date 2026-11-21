@@ -10,7 +10,7 @@ import { registrarPagamento, NOMES_FORMA } from './receber.js';
 import { escolherVersao } from '../conflito.js';
 import { pdfOrcamento } from '../pdf.js';
 
-const ABAS = [['todos', 'Todos'], ...ETAPAS.map(e => [e, NOMES_ETAPA[e]]), ['cancelado', 'Cancelados'], ['lixeira', 'Lixeira']];
+const ABAS = [['todos', 'Todos'], ['atrasados', 'Atrasados'], ...ETAPAS.map(e => [e, NOMES_ETAPA[e]]), ['cancelado', 'Cancelados'], ['lixeira', 'Lixeira']];
 
 export async function montarLista(el, aba = 'todos', vivo) {
   titulo('Pedidos');
@@ -22,8 +22,11 @@ export async function montarLista(el, aba = 'todos', vivo) {
   const cli = new Map(clientes.map(c => [c.id, c]));
   const pagosPor = new Map();
   pags.forEach(p => pagosPor.set(p.ficha_id, [...(pagosPor.get(p.ficha_id) || []), p]));
-  const conta = k => k === 'todos' ? fichas.filter(f => f.etapa !== 'cancelado').length : fichas.filter(f => f.etapa === k).length;
   const hoje = hojeISO();
+  // atrasado = passou do prazo e ainda está sendo feito (pronto só falta retirar, não conta)
+  const estaAtrasado = f => f.prazo && f.prazo < hoje && !['pronto', 'entregue', 'cancelado', 'orcamento'].includes(f.etapa);
+  const conta = k => k === 'todos' ? fichas.filter(f => f.etapa !== 'cancelado').length
+    : k === 'atrasados' ? fichas.filter(estaAtrasado).length : fichas.filter(f => f.etapa === k).length;
 
   el.innerHTML = `
     <div class="cabeca"><h2>${lixeira ? 'Lixeira' : 'Pedidos'}</h2><a class="btn btn-primario" href="#orcamento">${ICONE.mais.replace('<svg', '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"')}Novo</a></div>
@@ -41,17 +44,19 @@ export async function montarLista(el, aba = 'todos', vivo) {
     const vis = fichas.filter(f => {
       if (!lixeira) {
         if (aba === 'todos' && f.etapa === 'cancelado') return false;
-        if (aba !== 'todos' && f.etapa !== aba) return false;
+        if (aba === 'atrasados' && !estaAtrasado(f)) return false;
+        if (aba !== 'todos' && aba !== 'atrasados' && f.etapa !== aba) return false;
       }
       if (!t) return true;
       const c = cli.get(f.cliente_id);
       return String(f.numero) === t.replace(/^n[ºo°]?\s*/, '') || (c && c.nome.toLowerCase().includes(t)) ||
         (td && f.os_fpq && soDigitos(f.os_fpq).includes(td)) || (f.os_fpq || '').toLowerCase().includes(t);
     });
+    if (aba === 'atrasados') vis.sort((a, b) => a.prazo.localeCompare(b.prazo)); // o mais atrasado primeiro
     el.querySelector('#pd-lista').innerHTML = vis.length ? `<ul class="lista">${vis.map(f => {
       const c = cli.get(f.cliente_id) || { nome: '—' };
       const falta = saldoAberto(f.total_centavos, pagosPor.get(f.id));
-      const atrasado = f.prazo && f.prazo < hoje && !['pronto', 'entregue', 'cancelado', 'orcamento'].includes(f.etapa);
+      const atrasado = estaAtrasado(f);
       return `<li><a class="lista-item" href="#pedido/${f.id}">
         <span class="meio"><span class="nome">Nº ${esc(f.numero ?? 'novo')} · ${esc(c.nome)}</span>
           <span class="det"><span class="etapa etapa-${f.etapa}">${esc(NOMES_ETAPA[f.etapa])}</span>
@@ -61,7 +66,7 @@ export async function montarLista(el, aba = 'todos', vivo) {
         <span class="fim"><span class="valor">${moeda(f.total_centavos)}</span>
           ${f.etapa !== 'orcamento' && f.etapa !== 'cancelado' ? `<br><span class="det" style="font-size:13px;color:${falta ? 'var(--alerta)' : 'var(--ok)'}">${falta ? 'falta ' + moeda(falta) : 'quitado'}</span>` : ''}</span>
       </a></li>`; }).join('')}</ul>`
-      : `<p class="vazio">${lixeira ? 'A lixeira está vazia.' : 'Nenhum pedido aqui.'}</p>`;
+      : `<p class="vazio">${lixeira ? 'A lixeira está vazia.' : aba === 'atrasados' && !el.querySelector('#pd-busca').value.trim() ? 'Nenhum pedido atrasado.' : 'Nenhum pedido aqui.'}</p>`;
   };
   desenhar();
   el.querySelector('#pd-busca').addEventListener('input', desenhar);
