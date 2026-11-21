@@ -51,7 +51,7 @@ export async function montarLista(el, aba = 'todos', vivo) {
     el.querySelector('#pd-lista').innerHTML = vis.length ? `<ul class="lista">${vis.map(f => {
       const c = cli.get(f.cliente_id) || { nome: '—' };
       const falta = saldoAberto(f.total_centavos, pagosPor.get(f.id));
-      const atrasado = f.prazo && f.prazo < hoje && !['entregue', 'cancelado', 'orcamento'].includes(f.etapa);
+      const atrasado = f.prazo && f.prazo < hoje && !['pronto', 'entregue', 'cancelado', 'orcamento'].includes(f.etapa);
       return `<li><a class="lista-item" href="#pedido/${f.id}">
         <span class="meio"><span class="nome">Nº ${esc(f.numero ?? 'novo')} · ${esc(c.nome)}</span>
           <span class="det"><span class="etapa etapa-${f.etapa}">${esc(NOMES_ETAPA[f.etapa])}</span>

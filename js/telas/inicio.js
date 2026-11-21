@@ -92,8 +92,10 @@ export async function montar(el, _p, vivo) {
   const devendo = pedidos.filter(f => saldo(f) > 0).length;
 
   // alertas: o que precisa de ação agora
-  const atrasados = emAndamento.filter(f => f.prazo && f.prazo < hoje);
-  const venceLogo = emAndamento.filter(f => f.prazo && f.prazo >= hoje && f.prazo <= amanha);
+  // pedido pronto já cumpriu o prazo: só falta o cliente retirar, então não conta como atrasado
+  const comPrazo = emAndamento.filter(f => f.etapa !== 'pronto' && f.prazo);
+  const atrasados = comPrazo.filter(f => f.prazo < hoje);
+  const venceLogo = comPrazo.filter(f => f.prazo >= hoje && f.prazo <= amanha);
   const prontosParados = pedidos.filter(f => f.etapa === 'pronto' && Date.now() - Date.parse(f.etapa_em || f.criado_em) > 3 * DIA);
   const orcParados = orcamentos.filter(f => f.total_centavos > 0 && Date.now() - Date.parse(f.atualizado_em || f.criado_em) > 2 * DIA);
   const orcSemValor = orcamentos.filter(f => !f.total_centavos);
