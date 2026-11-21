@@ -57,7 +57,12 @@ export async function montarLista(el, aba = 'todos', vivo) {
       const c = cli.get(f.cliente_id) || { nome: '—' };
       const falta = saldoAberto(f.total_centavos, pagosPor.get(f.id));
       const atrasado = estaAtrasado(f);
-      return `<li><a class="lista-item" href="#pedido/${f.id}">
+      // orçamento abre o editor de itens; pedido abre a ficha (prazo, etapa, OS, observações)
+      const editar = f.etapa === 'orcamento' ? `#orcamento/${f.id}` : `#pedido/${f.id}`;
+      const acoes = lixeira ? '' : `<span class="acoes-linha">
+          <a class="icone-btn" href="${editar}" aria-label="Editar Nº ${esc(f.numero ?? '')}" title="Editar">${ICONE.editar}</a>
+          <button type="button" class="icone-btn perigo" data-apagar="${f.id}" aria-label="Apagar Nº ${esc(f.numero ?? '')}" title="Apagar">${ICONE.lixo}</button></span>`;
+      return `<li class="linha-pedido"><a class="lista-item" href="#pedido/${f.id}">
         <span class="meio"><span class="nome">Nº ${esc(f.numero ?? 'novo')} · ${esc(c.nome)}</span>
           <span class="det"><span class="etapa etapa-${f.etapa}">${esc(NOMES_ETAPA[f.etapa])}</span>
           ${orcamentoVencido(f, cfg.validade_dias) ? '<span class="selo alerta">vencido</span>' : ''}
@@ -65,11 +70,28 @@ export async function montarLista(el, aba = 'todos', vivo) {
           ${f.os_fpq ? ` · OS ${esc(f.os_fpq)}` : ''}</span></span>
         <span class="fim"><span class="valor">${moeda(f.total_centavos)}</span>
           ${f.etapa !== 'orcamento' && f.etapa !== 'cancelado' ? `<br><span class="det" style="font-size:13px;color:${falta ? 'var(--alerta)' : 'var(--ok)'}">${falta ? 'falta ' + moeda(falta) : 'quitado'}</span>` : ''}</span>
-      </a></li>`; }).join('')}</ul>`
+      </a>${acoes}</li>`; }).join('')}</ul>`
       : `<p class="vazio">${lixeira ? 'A lixeira está vazia.' : aba === 'atrasados' && !el.querySelector('#pd-busca').value.trim() ? 'Nenhum pedido atrasado.' : 'Nenhum pedido aqui.'}</p>`;
   };
   desenhar();
   el.querySelector('#pd-busca').addEventListener('input', desenhar);
+
+  // Apagar = mandar para a lixeira (dá para restaurar por 30 dias), igual ao botão Excluir da ficha
+  el.querySelector('#pd-lista').addEventListener('click', async e => {
+    const b = e.target.closest('[data-apagar]');
+    if (!b) return;
+    const f = fichas.find(x => x.id === b.dataset.apagar);
+    const nome = (cli.get(f?.cliente_id) || {}).nome || '';
+    if (!await confirmar(`Apagar o Nº ${f?.numero ?? ''}${nome ? ' de ' + nome : ''}? Ele vai para a lixeira e dá para restaurar por 30 dias.`, { ok: 'Apagar', perigo: true })) return;
+    b.disabled = true;
+    try {
+      await excluir('fichas', b.dataset.apagar);
+      fichas.splice(fichas.indexOf(f), 1);
+      avisar('Pedido na lixeira');
+      el.querySelectorAll('#pd-abas [data-aba]').forEach(x => { const k = x.dataset.aba; if (k !== 'lixeira') x.textContent = `${ABAS.find(a => a[0] === k)[1]} (${conta(k)})`; });
+      desenhar();
+    } catch (err) { b.disabled = false; avisar(err.message, 'erro'); }
+  });
 }
 
 export async function montarDetalhe(el, id, vivo) {

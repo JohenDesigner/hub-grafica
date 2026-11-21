@@ -417,3 +417,11 @@ body.com-painel{overflow:hidden}
 .h-soma-formas{font-size:13px;margin-top:2px}
 @media (min-width:900px){.h-soma{bottom:12px}}
 .atalho.azul{background:linear-gradient(135deg,var(--azul),#1f7f96)}
+/* pedidos: botões Editar e Apagar ao lado de cada linha */
+.linha-pedido{display:flex;align-items:center}
+.linha-pedido .lista-item{flex:1;min-width:0}
+.acoes-linha{display:flex;gap:6px;padding-right:12px;flex:none}
+.acoes-linha .icone-btn{width:38px;height:38px;color:var(--texto-2)}
+.acoes-linha .icone-btn svg{width:18px;height:18px}
+.acoes-linha .icone-btn:hover{color:var(--texto)}
+.acoes-linha .icone-btn.perigo:hover{color:var(--erro);border-color:color-mix(in srgb,var(--erro) 40%,var(--linha))}
