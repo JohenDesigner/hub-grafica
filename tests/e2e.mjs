@@ -22,7 +22,7 @@ let falhas = 0, passos = 0;
 const ok = (cond, nome) => { passos++; if (cond) console.log('  ok  ', nome); else { falhas++; console.log('  FALHA', nome); } };
 
 const navegador = await chromium.launch({ executablePath: process.env.CHROME || (fs.existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined) });
-const contexto = await navegador.newContext({ viewport: { width: 380, height: 820 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, acceptDownloads: true });
+const contexto = await navegador.newContext({ viewport: { width: 380, height: 820 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/130 Mobile Safari/537.36', acceptDownloads: true });
 const errosConsole = [];
 await contexto.route('**/vendor/supabase.js', r => r.fulfill({ path: path.join(RAIZ, 'tests/mock-supabase.js'), contentType: 'text/javascript' }));
 await contexto.route('https://johendesigner.github.io/Johen-site/novo/dados/produtos.json*', r => r.fulfill({ path: path.join(RAIZ, 'tests/fixtures/produtos.json'), contentType: 'application/json' }));
@@ -153,7 +153,7 @@ try {
     document.querySelector('#o-wpp').click(); return new Promise(r => setTimeout(() => { window.open = original; r(url); }, 300));
   });
   const msg = decodeURIComponent(href.split('text=')[1] || '');
-  ok(href.startsWith('https://wa.me/5511988887777') && msg.includes('Olá, Ana!') && msg.includes('Total: R$ 220,50') && msg.includes('100×60 cm'), 'mensagem de WhatsApp montada certo');
+  ok(/^https:\/\/(web|api)\.whatsapp\.com\/send\?phone=5511988887777/.test(href) && msg.includes('Olá, Ana!') && msg.includes('Total: R$ 220,50') && msg.includes('100×60 cm'), 'mensagem de WhatsApp montada certo');
   const comp = await pg.evaluate(() => {
     let dados = null; navigator.canShare = () => true; navigator.share = async d => { dados = d; };
     document.querySelector('#o-wpp-pdf').click();

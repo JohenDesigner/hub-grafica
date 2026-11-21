@@ -3,7 +3,7 @@ import { listar, obter, salvar, atualizar, ConflitoError } from '../db.js';
 import { calcularItem, calcularFicha, validarItem, somarDiasUteis, orcamentoVencido, emCentavos } from '../calc.js';
 import { NOMES_CATEGORIA } from '../catalogo.js';
 import { moeda, data, lerNumero, hojeISO, soDigitos } from '../formato.js';
-import { mensagem, linkWa, detalheItem } from '../whatsapp.js';
+import { mensagem, linkWa, detalheItem, abrirWa } from '../whatsapp.js';
 import { esc, avisar, abrirModal, fecharModal, titulo, ICONE } from '../ui.js';
 import { ir, protegerSaida } from '../rotas.js';
 import { todosProdutos, aPartirDe, formExtra, extraParaProduto } from './produtos.js';
@@ -225,7 +225,7 @@ export async function montar(el, param, vivo) {
     q('#o-wpp')?.addEventListener('click', async e => {
       e.preventDefault();
       if (!salvo && !(await gravar({ silencioso: true }))) return;
-      window.open(linkWa(cliente.whatsapp, mensagem('orcamento', { ficha, cliente, cfg })), '_blank', 'noopener');
+      abrirWa(linkWa(cliente.whatsapp, mensagem('orcamento', { ficha, cliente, cfg })));
     });
     q('#o-wpp-pdf')?.addEventListener('click', async e => {
       if (!salvo && !(await gravar({ silencioso: true }))) return;
@@ -274,7 +274,7 @@ export async function montar(el, param, vivo) {
     const a = Object.assign(document.createElement('a'), { href: url, download: nome });
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 60000);
-    window.open(linkWa(cliente.whatsapp, texto), '_blank', 'noopener');
+    abrirWa(linkWa(cliente.whatsapp, texto));
     avisar('PDF baixado. No WhatsApp, toque no clipe → Documento para anexar.');
   }
 

@@ -9,7 +9,7 @@ test('mensagem de orçamento', () => {
   assert.match(t, /2× Banner — 100×60 cm: R\$\s54,00/);
   assert.match(t, /Válido até: 08\/11\/2026/);
 });
-test('link', () => assert.equal(linkWa('(11) 98287-7142', 'oi'), 'https://wa.me/5511982877142?text=oi'));
+test('link', () => assert.equal(linkWa('(11) 98287-7142', 'oi'), 'https://api.whatsapp.com/send?phone=5511982877142&text=oi'));
 import { detalheItem } from '../js/whatsapp.js';
 test('detalhe do item', () => {
   assert.equal(detalheItem({ tipo: 'opcoes', opcao: { label: '100 un.', preco: 76.5 }, acabamentos: [] }), '100 un.');
@@ -25,4 +25,9 @@ test('mensagens saem como citação', () => {
   for (const l of t.split('\n')) assert.ok(l === '' || l.startsWith('> '), l);
   assert.match(t, /PEDIDO Nº 28 — PRONTO PARA RETIRADA/);
   assert.match(t, /Falta pagar: \*R\$\s84,00\*/);
+});
+test('link no computador abre o aplicativo do WhatsApp e mantém emoji', () => {
+  const l = linkWa('(11) 98287-7142', '✅ oi', true);
+  assert.ok(l.startsWith('whatsapp://send?phone=5511982877142&text='));
+  assert.equal(new URL(l).searchParams.get('text'), '✅ oi');
 });

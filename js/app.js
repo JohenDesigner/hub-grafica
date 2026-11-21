@@ -2,6 +2,7 @@
 import { usuarioAtual, entrar, chamar, aoMudarPendentes, pendentes, enviarPendentes, pedirTrocaDeSenha, trocarSenha, aoPedirNovaSenha } from './db.js';
 import { atualizarPendentes, abrirModal, fecharModal, avisar } from './ui.js';
 import { iniciar, registrar } from './rotas.js';
+import { abrirWa } from './whatsapp.js';
 import * as inicio from './telas/inicio.js';
 import * as orcamento from './telas/orcamento.js';
 import * as pedidos from './telas/pedidos.js';
@@ -61,6 +62,8 @@ function ligarBalcao() {
   document.getElementById('painel-balcao').addEventListener('click', e => { if (e.target.id === 'painel-balcao' && apertouFora) fecharPainelBalcao(); });
   addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('modal').hidden) fecharPainelBalcao(); });
   addEventListener('hashchange', () => { fecharPainelBalcao(); ajustarFab(); });
+  // qualquer botão que abre o WhatsApp também copia a mensagem
+  document.addEventListener('click', e => { const a = e.target.closest('a[href^="whatsapp://send"], a[href^="https://api.whatsapp.com/send"]'); if (a) { e.preventDefault(); abrirWa(a.href); } });
   ajustarFab();
 }
 

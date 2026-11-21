@@ -54,6 +54,27 @@ export function mensagem(tipo, { ficha, cliente, cfg = {}, saldo = 0 }) {
   }));
 }
 
-export function linkWa(telefone, texto) {
-  return `https://wa.me/${telefoneWa(telefone)}?text=${encodeURIComponent(texto)}`;
+// No computador abre direto o aplicativo do WhatsApp (whatsapp://); no celular, api.whatsapp.com (abre o app).
+// Nada de wa.me: ao redirecionar, ele estraga os emojis (viram �).
+const ehComputador = () => typeof window !== 'undefined' && !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+export function linkWa(telefone, texto, app = ehComputador()) {
+  const base = app ? 'whatsapp://send' : 'https://api.whatsapp.com/send';
+  return `${base}?phone=${telefoneWa(telefone)}&text=${encodeURIComponent(texto)}`;
+}
+
+// Abre o WhatsApp (copiando a mensagem antes). O whatsapp:// abre na mesma aba, sem deixar aba vazia pra trás.
+export function abrirWa(link) {
+  copiarDoLink(link);
+  if (link.startsWith('whatsapp://')) location.href = link;
+  else window.open(link, '_blank', 'noopener');
+}
+
+// Garantia: ao abrir o WhatsApp, a mensagem também vai pra área de transferência.
+// Se o WhatsApp mostrar algo estragado, é só apagar e colar (Ctrl+V).
+export function copiarDoLink(url) {
+  try {
+    const texto = new URL(url).searchParams.get('text');
+    if (texto) navigator.clipboard?.writeText(texto).catch(() => {});
+  } catch { /* link sem texto */ }
 }
