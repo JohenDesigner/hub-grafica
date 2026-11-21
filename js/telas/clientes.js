@@ -2,7 +2,7 @@
 import { listar, obter, salvar, atualizar, excluir } from '../db.js';
 import { moeda, data, soDigitos } from '../formato.js';
 import { NOMES_ETAPA } from '../calc.js';
-import { linkWa } from '../whatsapp.js';
+import { linkWa, citar } from '../whatsapp.js';
 import { esc, avisar, confirmar, abrirModal, fecharModal, titulo, lerForm, ICONE } from '../ui.js';
 import { ir } from '../rotas.js';
 import { buscarCnpj, buscarCep, cnpjValido, formatarCnpj, linhaEndereco } from '../cnpj.js';
@@ -168,7 +168,7 @@ export async function montarDetalhe(el, id, vivo) {
       </div>
       ${c.observacoes ? `<p class="sub" style="white-space:pre-wrap">${esc(c.observacoes)}</p>` : ''}
       <div class="botoes">
-        ${c.whatsapp ? `<a class="btn btn-wpp" href="${linkWa(c.whatsapp, `Olá, ${c.nome.split(' ')[0]}!`)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}
+        ${c.whatsapp ? `<a class="btn btn-wpp" href="${linkWa(c.whatsapp, citar(`Olá, ${c.nome.split(' ')[0]}!`))}" target="_blank" rel="noopener">WhatsApp</a>` : ''}
         <a class="btn btn-primario" href="#orcamento/cliente:${c.id}">Novo orçamento</a>
         <button class="btn" id="c-editar">Editar</button>
       </div>

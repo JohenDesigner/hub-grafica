@@ -92,7 +92,7 @@ export async function montar(el) {
       <p class="sub">Marcadores que viram dados: ${esc(MARCADORES)}</p>
       ${Object.keys(NOMES_TEXTO).map(k => `
         <label class="campo"><span>${NOMES_TEXTO[k]}</span>
-          <textarea name="texto_${k}" rows="5">${esc(cfg.textos[k] || PADRAO[k])}</textarea></label>
+          <textarea name="texto_${k}" rows="9">${esc(cfg.textos[k] || PADRAO[k])}</textarea></label>
         <button type="button" class="btn btn-peq" data-padrao="${k}">Voltar ao padrão</button>`).join('')}
       <button class="btn btn-primario btn-bloco" type="submit">Salvar configurações</button>
     </form>

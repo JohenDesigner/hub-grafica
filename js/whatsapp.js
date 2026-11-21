@@ -17,17 +17,26 @@ const linhaItem = it => {
 };
 const trocar = (t, v) => t.replace(/\{(\w+)\}/g, (_, k) => v[k] ?? '');
 
+// Cada linha com texto vira citação do WhatsApp ("> "), com a barrinha do lado — parece aviso do sistema.
+// Linha em branco fica fora da citação e separa os blocos. Linha que já começa com ">" não é mexida.
+export function citar(texto) {
+  return texto.split('\n').map(l => {
+    const t = l.trim();
+    return !t || t.startsWith('>') ? t : `> ${t}`;
+  }).join('\n');
+}
+
 export const PADRAO = {
-  orcamento: 'Olá, {cliente}! Segue o orçamento nº {numero} da {grafica}:\n\n{itens}\n\nTotal: {total}\nSinal (50%): {sinal}\nPrazo: {prazo}\nVálido até: {validade}\n\nPix (e-mail): {pix}\nRecebedor: {recebedor}. Confira o nome antes de pagar.\n\nPra começar a produção, me mande aqui o comprovante do sinal de 50%.',
-  arte: 'Olá, {cliente}! A arte do pedido nº {numero} está pronta. Pode conferir e me dizer se aprova?',
-  pronto: 'Olá, {cliente}! Seu pedido nº {numero} está pronto para retirada na {grafica}, {endereco}. Horário: {horario}.{falta}',
-  cobranca: 'Olá, {cliente}! Consta em aberto {saldo} do pedido nº {numero}. Pix (e-mail): {pix}. Recebedor: {recebedor}, confira o nome antes de pagar. Depois me mande o comprovante aqui. Obrigado!'
+  orcamento: '🧾 *ORÇAMENTO Nº {numero}* — {grafica}\nOlá, {cliente}!\n\n{itens}\n\n💰 Total: *{total}*\n💳 Sinal (50%): *{sinal}*\n📅 Prazo: {prazo}\n⏳ Válido até: {validade}\n\n🔑 Pix (e-mail): {pix}\n👤 Recebedor: {recebedor} — confira o nome antes de pagar.\n\n📎 Pra começar a produção, me mande aqui o comprovante do sinal de 50%.',
+  arte: '🎨 *ARTE PRONTA — PEDIDO Nº {numero}*\nOlá, {cliente}!\nPode conferir e me dizer se aprova?',
+  pronto: '✅ *PEDIDO Nº {numero} — PRONTO PARA RETIRADA*\nOlá, {cliente}!\n🏪 {grafica}\n📍 {endereco}\n🕐 {horario}{falta}',
+  cobranca: '⚠️ *PAGAMENTO EM ABERTO — PEDIDO Nº {numero}*\nOlá, {cliente}!\n💰 Saldo: *{saldo}*\n🔑 Pix (e-mail): {pix}\n👤 Recebedor: {recebedor} — confira o nome antes de pagar.\n📎 Depois me mande o comprovante aqui. Obrigado!'
 };
 
 export function mensagem(tipo, { ficha, cliente, cfg = {}, saldo = 0 }) {
   const modelo = (cfg.textos && cfg.textos[tipo]) || PADRAO[tipo];
   const validade = new Date(new Date(ficha.criado_em || Date.now()).getTime() + (cfg.validade_dias || 7) * 864e5);
-  return trocar(modelo, {
+  return citar(trocar(modelo, {
     cliente: (cliente.nome || '').split(' ')[0],
     numero: ficha.numero ?? '',
     grafica: cfg.nome || 'Johen Arte Grafica',
@@ -41,8 +50,8 @@ export function mensagem(tipo, { ficha, cliente, cfg = {}, saldo = 0 }) {
     endereco: cfg.endereco || '',
     horario: cfg.horario || '',
     saldo: moeda(saldo),
-    falta: saldo > 0 ? ` Falta pagar ${moeda(saldo)}.` : ''
-  });
+    falta: saldo > 0 ? `\n💰 Falta pagar: *${moeda(saldo)}*` : ''
+  }));
 }
 
 export function linkWa(telefone, texto) {

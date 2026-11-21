@@ -17,3 +17,12 @@ test('detalhe do item', () => {
   assert.equal(detalheItem({ tipo: 'opcoes', livre: true, largura_cm: 150, altura_cm: 100, acabamentos: [] }), '150×100 cm');
   assert.equal(detalheItem({ tipo: 'opcoes', opcao: { label: 'Frente e Verso (+R$15)', preco: 60 }, acabamentos: [] }), 'Frente e Verso');
 });
+import { citar } from '../js/whatsapp.js';
+test('mensagens saem como citação', () => {
+  assert.equal(citar('a\n\nb\n> c'), '> a\n\n> b\n> c');
+  const t = mensagem('pronto', { ficha: { numero: 28 }, cliente: { nome: 'Marcia Lima' }, saldo: 8400,
+    cfg: { endereco: 'R. Pedro Fernandes Aragão, 269', horario: 'seg a sáb, 11h às 20h' } });
+  for (const l of t.split('\n')) assert.ok(l === '' || l.startsWith('> '), l);
+  assert.match(t, /PEDIDO Nº 28 — PRONTO PARA RETIRADA/);
+  assert.match(t, /Falta pagar: \*R\$\s84,00\*/);
+});
