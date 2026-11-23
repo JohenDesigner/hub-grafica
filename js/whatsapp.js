@@ -33,8 +33,13 @@ export const PADRAO = {
   cobranca: '⚠️ *PAGAMENTO EM ABERTO — PEDIDO Nº {numero}*\nOlá, {cliente}!\n💰 Saldo: *{saldo}*\n🔑 Pix (e-mail): {pix}\n👤 Recebedor: {recebedor} — confira o nome antes de pagar.\n📎 Depois me mande o comprovante aqui. Obrigado!'
 };
 
+// Pedido de "de acordo" no fim de todo orçamento (mesmo com texto personalizado nas Configurações).
+// A resposta escrita do cliente no WhatsApp fica como prova de que ele leu e aceitou as condições do PDF.
+export const ACEITE = '📄 As condições gerais (arte, cores, prazo, retirada e cancelamento) estão no PDF do orçamento.\n✍️ Pra confirmar, me responde aqui: *Li e concordo com o orçamento nº {numero} e as condições.*';
+
 export function mensagem(tipo, { ficha, cliente, cfg = {}, saldo = 0 }) {
-  const modelo = (cfg.textos && cfg.textos[tipo]) || PADRAO[tipo];
+  let modelo = (cfg.textos && cfg.textos[tipo]) || PADRAO[tipo];
+  if (tipo === 'orcamento' && !/Li e concordo/i.test(modelo)) modelo += '\n\n' + ACEITE;
   const validade = new Date(new Date(ficha.criado_em || Date.now()).getTime() + (cfg.validade_dias || 7) * 864e5);
   return citar(trocar(modelo, {
     cliente: (cliente.nome || '').split(' ')[0],

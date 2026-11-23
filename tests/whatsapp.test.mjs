@@ -31,3 +31,13 @@ test('link no computador abre o aplicativo do WhatsApp e mantém emoji', () => {
   assert.ok(l.startsWith('whatsapp://send?phone=5511982877142&text='));
   assert.equal(new URL(l).searchParams.get('text'), '✅ oi');
 });
+test('orçamento pede o de acordo do cliente, também com texto personalizado', () => {
+  const ficha = { numero: 31, total_centavos: 1000, itens: [] };
+  for (const cfg of [{}, { textos: { orcamento: 'Oi {cliente}, total {total}' } }]) {
+    const t = mensagem('orcamento', { ficha, cliente: { nome: 'Ana' }, cfg });
+    assert.match(t, /> ✍️ Pra confirmar, me responde aqui: \*Li e concordo com o orçamento nº 31 e as condições\.\*/);
+  }
+  const ja = mensagem('orcamento', { ficha, cliente: { nome: 'Ana' }, cfg: { textos: { orcamento: 'Responda: Li e concordo' } } });
+  assert.doesNotMatch(ja, /Pra confirmar/);
+  assert.doesNotMatch(mensagem('arte', { ficha, cliente: { nome: 'Ana' } }), /Li e concordo/);
+});
