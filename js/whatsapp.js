@@ -19,15 +19,20 @@ const trocar = (t, v) => t.replace(/\{(\w+)\}/g, (_, k) => v[k] ?? '');
 
 // Cada linha com texto vira citação do WhatsApp ("> "), com a barrinha do lado — parece aviso do sistema.
 // Linha em branco fica fora da citação e separa os blocos. Linha que já começa com ">" não é mexida.
+// Linha que é só um link também fica fora, para ser clicável em qualquer WhatsApp.
 export function citar(texto) {
   return texto.split('\n').map(l => {
     const t = l.trim();
-    return !t || t.startsWith('>') ? t : `> ${t}`;
+    return !t || t.startsWith('>') || /^https?:\/\/\S+$/i.test(t) ? t : `> ${t}`;
   }).join('\n');
 }
 
+// Link que abre direto a caixa de avaliação do perfil da Johen no Google.
+export const LINK_AVALIACAO = 'https://g.page/r/CWKTHinBP02gEAE/review';
+
 export const PADRAO = {
   orcamento: '🧾 *ORÇAMENTO Nº {numero}* — {grafica}\nOlá, {cliente}!\n\n{itens}\n\n💰 Total: *{total}*\n💳 Sinal (50%): *{sinal}*\n📅 Prazo: {prazo}\n⏳ Válido até: {validade}\n\n🔑 Pix (e-mail): {pix}\n👤 Recebedor: {recebedor} — confira o nome antes de pagar.\n\n📎 Pra começar a produção, me mande aqui o comprovante do sinal de 50%.',
+  avaliacao: '💛 *OBRIGADO PELA PREFERÊNCIA, {cliente}!*\nSeu pedido nº {numero} foi entregue. Esperamos que você tenha gostado!\n\n⭐ Pode contar no Google como foi a sua experiência com a {grafica}? Leva menos de 1 minuto e ajuda muito. Se quiser, coloque uma foto do que a gente fez! 📸\n\n{avaliacao}',
   arte: '🎨 *ARTE PRONTA — PEDIDO Nº {numero}*\nOlá, {cliente}!\nPode conferir e me dizer se aprova?',
   pronto: '✅ *PEDIDO Nº {numero} — PRONTO PARA RETIRADA*\nOlá, {cliente}!\n🏪 {grafica}\n📍 {endereco}\n🕐 {horario}{falta}',
   cobranca: '⚠️ *PAGAMENTO EM ABERTO — PEDIDO Nº {numero}*\nOlá, {cliente}!\n💰 Saldo: *{saldo}*\n🔑 Pix (e-mail): {pix}\n👤 Recebedor: {recebedor} — confira o nome antes de pagar.\n📎 Depois me mande o comprovante aqui. Obrigado!'
@@ -55,6 +60,7 @@ export function mensagem(tipo, { ficha, cliente, cfg = {}, saldo = 0 }) {
     endereco: cfg.endereco || '',
     horario: cfg.horario || '',
     saldo: moeda(saldo),
+    avaliacao: LINK_AVALIACAO,
     falta: saldo > 0 ? `\n💰 Falta pagar: *${moeda(saldo)}*` : ''
   }));
 }

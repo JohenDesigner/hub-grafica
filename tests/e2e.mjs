@@ -193,8 +193,11 @@ try {
     await pg.waitForSelector(`main .etapa:has-text("${e}")`);
   }
   ok((await texto('main .etapa')) === 'Entregue', 'avançou até Entregue');
+  ok(await pg.locator('a.btn-wpp', { hasText: 'Pedir avaliação no Google' }).count() === 1, 'botão "Pedir avaliação no Google" na etapa Entregue');
+  ok(decodeURIComponent(await pg.locator('a.btn-wpp', { hasText: 'Pedir avaliação no Google' }).getAttribute('href')).includes('https://g.page/r/CWKTHinBP02gEAE/review'), 'mensagem de avaliação leva o link do Google');
   await clicarTexto('◀ Pronto'); await pg.waitForSelector('main .etapa:has-text("Pronto")');
   ok(true, 'voltou uma etapa');
+  ok(await pg.locator('a.btn-wpp', { hasText: 'Pedir avaliação' }).count() === 0, 'sem pedido de avaliação antes de Entregue');
   ok(await pg.locator('a.btn-wpp', { hasText: 'Avisar que está pronto' }).count() === 1, 'botão "Avisar que está pronto" na etapa Pronto');
 
   console.log('Detalhes e conflito');

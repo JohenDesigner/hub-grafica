@@ -115,6 +115,7 @@ export async function montarDetalhe(el, id, vivo) {
     ficha.etapa === 'orcamento' && wpp('orcamento', 'Enviar orçamento'),
     ['arte', 'aprovacao'].includes(ficha.etapa) && wpp('arte', 'Pedir aprovação da arte'),
     ficha.etapa === 'pronto' && wpp('pronto', 'Avisar que está pronto'),
+    ficha.etapa === 'entregue' && wpp('avaliacao', 'Pedir avaliação no Google'),
     falta > 0 && !['orcamento', 'cancelado'].includes(ficha.etapa) && wpp('cobranca', 'Cobrar')
   ].filter(Boolean).join('');
 

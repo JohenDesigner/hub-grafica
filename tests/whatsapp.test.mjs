@@ -41,3 +41,12 @@ test('orçamento pede o de acordo do cliente, também com texto personalizado', 
   assert.doesNotMatch(ja, /Pra confirmar/);
   assert.doesNotMatch(mensagem('arte', { ficha, cliente: { nome: 'Ana' } }), /Li e concordo/);
 });
+test('pedido de avaliação: nome, número e link sozinho na última linha, fora da citação', () => {
+  const base = { ficha: { numero: 40 }, cliente: { nome: 'Ana Souza' } };
+  const t = mensagem('avaliacao', base);
+  assert.match(t, /PREFERÊNCIA, Ana!/);
+  assert.match(t, /pedido nº 40/);
+  assert.equal(t.split('\n').at(-1), 'https://g.page/r/CWKTHinBP02gEAE/review');
+  assert.doesNotMatch(t, /[{}]/);
+  assert.match(mensagem('avaliacao', { ...base, cfg: { textos: { avaliacao: 'Oi {cliente}\n{avaliacao}' } } }), /^> Oi Ana\nhttps:\/\/g\.page/);
+});

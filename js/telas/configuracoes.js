@@ -58,8 +58,8 @@ export async function carregarCfg() {
   return cache;
 }
 
-const NOMES_TEXTO = { orcamento: 'Orçamento', arte: 'Arte para aprovar', pronto: 'Pedido pronto', cobranca: 'Cobrança' };
-const MARCADORES = '{cliente} {numero} {itens} {total} {sinal} {prazo} {validade} {pix} {recebedor} {endereco} {horario} {saldo} {grafica}';
+const NOMES_TEXTO = { orcamento: 'Orçamento', arte: 'Arte para aprovar', pronto: 'Pedido pronto', avaliacao: 'Pedir avaliação no Google (pedido entregue)', cobranca: 'Cobrança' };
+const MARCADORES = '{cliente} {numero} {itens} {total} {sinal} {prazo} {validade} {pix} {recebedor} {endereco} {horario} {saldo} {grafica} {avaliacao}';
 
 export async function montar(el) {
   titulo('Configurações');
