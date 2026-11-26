@@ -69,3 +69,18 @@ test('dias úteis pulam sábado e domingo', () => {
   assert.equal(somarDiasUteis('2026-11-06', 1), '2026-11-09');   // sexta + 1 = segunda
   assert.equal(somarDiasUteis('2026-11-02', 5), '2026-11-09');   // segunda + 5 = segunda seguinte
 });
+
+// lembrete dos adesivos
+import { adesivoParaProducao } from '../js/calc.js';
+{
+  const D = 864e5, agora = Date.parse('2026-11-26T12:00:00Z');
+  const ades = { produto_id: 'site:adesivos:vinil', nome: 'Adesivo vinil' };
+  const f = (etapa, dias, itens = [ades]) => ({ etapa, itens, pedido_em: new Date(agora - dias * D).toISOString() });
+  assert.equal(adesivoParaProducao(f('arte', 3), agora), true);
+  assert.equal(adesivoParaProducao(f('aprovacao', 5), agora), true);
+  assert.equal(adesivoParaProducao(f('sinal', 2.9), agora), false);
+  assert.equal(adesivoParaProducao(f('producao', 10), agora), false);
+  assert.equal(adesivoParaProducao(f('orcamento', 10), agora), false);
+  assert.equal(adesivoParaProducao(f('arte', 10, [{ nome: 'Cartão de visita' }]), agora), false);
+  assert.equal(adesivoParaProducao(f('arte', 4, [{ nome: 'ADESIVO redondo' }]), agora), true);
+}

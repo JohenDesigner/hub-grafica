@@ -1,6 +1,6 @@
 // Pedidos: lista por etapa e detalhe da ficha.
 import { db, listar, obter, atualizar, excluir, restaurar, ConflitoError } from '../db.js';
-import { ETAPAS, NOMES_ETAPA, saldoAberto, calcularFicha, calcularItem, orcamentoVencido } from '../calc.js';
+import { ETAPAS, NOMES_ETAPA, saldoAberto, calcularFicha, calcularItem, orcamentoVencido, adesivoParaProducao, DIAS_ADESIVO } from '../calc.js';
 import { moeda, data, soDigitos, hojeISO } from '../formato.js';
 import { mensagem, linkWa, detalheItem } from '../whatsapp.js';
 import { esc, avisar, confirmar, titulo, ICONE } from '../ui.js';
@@ -10,7 +10,8 @@ import { registrarPagamento, NOMES_FORMA } from './receber.js';
 import { escolherVersao } from '../conflito.js';
 import { pdfOrcamento } from '../pdf.js';
 
-const ABAS = [['todos', 'Todos'], ['atrasados', 'Atrasados'], ...ETAPAS.map(e => [e, NOMES_ETAPA[e]]), ['cancelado', 'Cancelados'], ['lixeira', 'Lixeira']];
+// "Pedidos" = só orçamento que virou pedido (sem orçamento e sem cancelado)
+const ABAS = [['todos', 'Todos'], ['pedidos', 'Pedidos'], ['atrasados', 'Atrasados'], ['adesivos', 'Adesivos p/ produção'], ...ETAPAS.map(e => [e, NOMES_ETAPA[e]]), ['cancelado', 'Cancelados'], ['lixeira', 'Lixeira']];
 
 export async function montarLista(el, aba = 'todos', vivo) {
   titulo('Pedidos');
@@ -25,12 +26,15 @@ export async function montarLista(el, aba = 'todos', vivo) {
   const hoje = hojeISO();
   // atrasado = passou do prazo e ainda está sendo feito (pronto só falta retirar, não conta)
   const estaAtrasado = f => f.prazo && f.prazo < hoje && !['pronto', 'entregue', 'cancelado', 'orcamento'].includes(f.etapa);
+  const ehPedido = f => !['orcamento', 'cancelado'].includes(f.etapa);
   const conta = k => k === 'todos' ? fichas.filter(f => f.etapa !== 'cancelado').length
+    : k === 'pedidos' ? fichas.filter(ehPedido).length
+    : k === 'adesivos' ? fichas.filter(f => adesivoParaProducao(f)).length
     : k === 'atrasados' ? fichas.filter(estaAtrasado).length : fichas.filter(f => f.etapa === k).length;
 
   el.innerHTML = `
     <div class="cabeca"><h2>${lixeira ? 'Lixeira' : 'Pedidos'}</h2><a class="btn btn-primario" href="#orcamento">${ICONE.mais.replace('<svg', '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"')}Novo</a></div>
-    <div class="abas" id="pd-abas">${ABAS.map(([k, n]) => `<button type="button" data-aba="${k}" aria-pressed="${k === aba}">${esc(n)}${k !== 'lixeira' && !lixeira ? ` (${conta(k)})` : ''}</button>`).join('')}</div>
+    <div class="abas" id="pd-abas">${ABAS.filter(([k]) => k !== 'adesivos' || aba === 'adesivos' || conta('adesivos')).map(([k, n]) => `<button type="button" data-aba="${k}" aria-pressed="${k === aba}">${esc(n)}${k !== 'lixeira' && !lixeira ? ` (${conta(k)})` : ''}</button>`).join('')}</div>
     <label class="campo"><span>Buscar por nº, cliente ou OS do FpqSystem</span><input id="pd-busca" type="search" autocomplete="off"></label>
     ${lixeira ? '<p class="sub">Pedidos excluídos ficam aqui por 30 dias e depois somem.</p>' : ''}
     <div id="pd-lista"></div>`;
@@ -45,7 +49,9 @@ export async function montarLista(el, aba = 'todos', vivo) {
       if (!lixeira) {
         if (aba === 'todos' && f.etapa === 'cancelado') return false;
         if (aba === 'atrasados' && !estaAtrasado(f)) return false;
-        if (aba !== 'todos' && aba !== 'atrasados' && f.etapa !== aba) return false;
+        if (aba === 'pedidos' && !ehPedido(f)) return false;
+        if (aba === 'adesivos' && !adesivoParaProducao(f)) return false;
+        if (!['todos', 'atrasados', 'pedidos', 'adesivos'].includes(aba) && f.etapa !== aba) return false;
       }
       if (!t) return true;
       const c = cli.get(f.cliente_id);
@@ -66,12 +72,13 @@ export async function montarLista(el, aba = 'todos', vivo) {
         <span class="meio"><span class="nome">Nº ${esc(f.numero ?? 'novo')} · ${esc(c.nome)}</span>
           <span class="det"><span class="etapa etapa-${f.etapa}">${esc(NOMES_ETAPA[f.etapa])}</span>
           ${orcamentoVencido(f, cfg.validade_dias) ? '<span class="selo alerta">vencido</span>' : ''}
+          ${adesivoParaProducao(f) ? '<span class="selo erro">mandar p/ produção</span>' : ''}
           ${f.prazo ? ` <span style="${atrasado ? 'color:var(--erro);font-weight:700' : ''}">prazo ${data(f.prazo)}</span>` : ''}
           ${f.os_fpq ? ` · OS ${esc(f.os_fpq)}` : ''}</span></span>
         <span class="fim"><span class="valor">${moeda(f.total_centavos)}</span>
           ${f.etapa !== 'orcamento' && f.etapa !== 'cancelado' ? `<br><span class="det" style="font-size:13px;color:${falta ? 'var(--alerta)' : 'var(--ok)'}">${falta ? 'falta ' + moeda(falta) : 'quitado'}</span>` : ''}</span>
       </a>${acoes}</li>`; }).join('')}</ul>`
-      : `<p class="vazio">${lixeira ? 'A lixeira está vazia.' : aba === 'atrasados' && !el.querySelector('#pd-busca').value.trim() ? 'Nenhum pedido atrasado.' : 'Nenhum pedido aqui.'}</p>`;
+      : `<p class="vazio">${lixeira ? 'A lixeira está vazia.' : aba === 'atrasados' && !el.querySelector('#pd-busca').value.trim() ? 'Nenhum pedido atrasado.' : aba === 'adesivos' ? 'Nenhum adesivo esperando produção.' : 'Nenhum pedido aqui.'}</p>`;
   };
   desenhar();
   el.querySelector('#pd-busca').addEventListener('input', desenhar);
@@ -132,6 +139,8 @@ export async function montarDetalhe(el, id, vivo) {
       ${cancelado ? '' : `<div class="trilha" aria-hidden="true">${ETAPAS.map((e, i) => `<span class="${i < idx ? 'feita' : i === idx ? 'atual' : ''}" title="${NOMES_ETAPA[e]}"></span>`).join('')}</div>
       <p class="sub" style="margin-top:6px">${ETAPAS.map((e, i) => i === idx ? `<b style="color:var(--texto)">${NOMES_ETAPA[e]}</b>` : NOMES_ETAPA[e]).join(' › ')}</p>`}
       ${orcamentoVencido(ficha, cfg.validade_dias) ? '<p class="aviso">Orçamento vencido: passou da validade.</p>' : ''}
+      ${adesivoParaProducao(ficha) && !excluido ? `<div class="aviso aviso-adesivo"><b>Adesivo: mandar pra produção.</b> Já fazem ${DIAS_ADESIVO} dias ou mais que virou pedido${ficha.pedido_em ? ` (${data(ficha.pedido_em)})` : ''}. Pode pular a aprovação da arte.
+        <button class="btn btn-primario btn-peq" data-etapa="producao" style="margin-top:8px">Mandar pra Produção ▶</button></div>` : ''}
       ${excluido ? '' : `<div class="botoes">
         ${cancelado ? '<button class="btn" data-etapa="orcamento">Reabrir como orçamento</button>' : `
           ${idx > 0 ? `<button class="btn" data-etapa="${ETAPAS[idx - 1]}">◀ ${NOMES_ETAPA[ETAPAS[idx - 1]]}</button>` : ''}
@@ -192,6 +201,7 @@ export async function montarDetalhe(el, id, vivo) {
 
   el.querySelectorAll('[data-etapa]').forEach(b => b.addEventListener('click', async () => {
     const nova = b.dataset.etapa;
+    if (nova === 'producao' && b.closest('.aviso-adesivo') && !await confirmar('Mandar este adesivo direto pra Produção, pulando a aprovação da arte?', { ok: 'Mandar pra Produção', cancelar: 'Voltar' })) return;
     if (nova === 'cancelado' && !await confirmar('Cancelar este pedido?', { ok: 'Cancelar pedido', perigo: true, cancelar: 'Voltar' })) return;
     if (await mudar({ etapa: nova })) { avisar(`Etapa: ${NOMES_ETAPA[nova]}`); recarregar(); }
   }));

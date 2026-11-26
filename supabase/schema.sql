@@ -126,3 +126,15 @@ grant execute on function limpa_lixeira() to authenticated;
 
 -- função criada pelo Supabase ao ligar "automatic RLS": não deve ser chamada de fora
 revoke execute on function public.rls_auto_enable() from anon, authenticated, public;
+
+-- 26/11/2026: data em que o orçamento virou pedido (usada no lembrete dos adesivos: produção 3 dias depois)
+alter table fichas add column if not exists pedido_em timestamptz;
+create or replace function marca_pedido() returns trigger language plpgsql set search_path = public as $$
+begin
+  if new.etapa in ('orcamento') then new.pedido_em = null;
+  elsif new.pedido_em is null and new.etapa <> 'cancelado' then new.pedido_em = now();
+  end if;
+  return new;
+end $$;
+drop trigger if exists t_fic_pedido on fichas;
+create trigger t_fic_pedido before insert or update of etapa on fichas for each row execute function marca_pedido();

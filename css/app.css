@@ -425,3 +425,4 @@ body.com-painel{overflow:hidden}
 .acoes-linha .icone-btn svg{width:18px;height:18px}
 .acoes-linha .icone-btn:hover{color:var(--texto)}
 .acoes-linha .icone-btn.perigo:hover{color:var(--erro);border-color:color-mix(in srgb,var(--erro) 40%,var(--linha))}
+.aviso-adesivo{background:var(--t-erro);color:var(--erro);margin-top:10px}.aviso-adesivo .btn{display:flex}
