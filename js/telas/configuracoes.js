@@ -15,6 +15,7 @@ export const PADRAO_CFG = {
   recebedor: 'JOSÉ HENRIQUE',
   logo: '',
   validade_dias: 7,
+  dias_adesivo: 3,   // adesivo vai pra produção X dias depois de virar pedido, mesmo sem aprovação da arte
   textos: {},
   respostas: null   // respostas prontas das Conversas (null = usa as padrão)
 };
@@ -81,6 +82,8 @@ export async function montar(el) {
       </div>
       <label class="campo"><span>Horário</span><input name="horario" value="${esc(cfg.horario)}"></label>
       <label class="campo"><span>Validade do orçamento (dias)</span><input name="validade_dias" type="number" min="1" max="90" value="${esc(cfg.validade_dias)}" inputmode="numeric"></label>
+      <label class="campo"><span>Adesivos: mandar pra produção depois de quantos dias do pedido</span><input name="dias_adesivo" type="number" min="1" max="60" value="${esc(cfg.dias_adesivo)}" inputmode="numeric"></label>
+      <p class="sub">Passado esse prazo, o hub avisa pra mandar o adesivo pra produção, mesmo sem a aprovação da arte.</p>
       <div class="campo"><span>Logo do PDF</span>
         <div class="campo-linha" style="align-items:center">
           <img id="cfg-logo" src="${esc(cfg.logo || 'img/logo-wordmark.webp')}" alt="" style="height:40px;max-width:160px;object-fit:contain;background:#fff;border-radius:8px;padding:4px">
@@ -126,9 +129,9 @@ export async function montar(el) {
       if (v.trim() && v.trim() !== PADRAO[k].trim()) textos[k] = v;
     }
     const anterior = await carregarCfg();
-    const { respostas, ia_auto, balcao } = anterior;
-    const dados = { ...(respostas ? { respostas } : {}), ...(ia_auto === false ? { ia_auto } : {}), ...(balcao ? { balcao } : {}), nome: d.nome, cnpj: d.cnpj, whatsapp: d.whatsapp, endereco: d.endereco, instagram: d.instagram,
-      pix: d.pix, recebedor: d.recebedor, horario: d.horario, validade_dias: Math.max(1, parseInt(d.validade_dias, 10) || 7), logo, textos };
+    const dados = { ...anterior, nome: d.nome, cnpj: d.cnpj, whatsapp: d.whatsapp, endereco: d.endereco, instagram: d.instagram,
+      pix: d.pix, recebedor: d.recebedor, horario: d.horario, validade_dias: Math.max(1, parseInt(d.validade_dias, 10) || 7),
+      dias_adesivo: Math.min(60, Math.max(1, parseInt(d.dias_adesivo, 10) || 3)), logo, textos };
     const btn = e.target.querySelector('[type=submit]'); btn.disabled = true;
     try {
       const u = await usuarioAtual();

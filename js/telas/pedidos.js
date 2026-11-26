@@ -1,6 +1,6 @@
 // Pedidos: lista por etapa e detalhe da ficha.
 import { db, listar, obter, atualizar, excluir, restaurar, ConflitoError } from '../db.js';
-import { ETAPAS, NOMES_ETAPA, saldoAberto, calcularFicha, calcularItem, orcamentoVencido, adesivoParaProducao, DIAS_ADESIVO } from '../calc.js';
+import { ETAPAS, NOMES_ETAPA, saldoAberto, calcularFicha, calcularItem, orcamentoVencido, adesivoParaProducao } from '../calc.js';
 import { moeda, data, soDigitos, hojeISO } from '../formato.js';
 import { mensagem, linkWa, detalheItem } from '../whatsapp.js';
 import { esc, avisar, confirmar, titulo, ICONE } from '../ui.js';
@@ -29,7 +29,7 @@ export async function montarLista(el, aba = 'todos', vivo) {
   const ehPedido = f => !['orcamento', 'cancelado'].includes(f.etapa);
   const conta = k => k === 'todos' ? fichas.filter(f => f.etapa !== 'cancelado').length
     : k === 'pedidos' ? fichas.filter(ehPedido).length
-    : k === 'adesivos' ? fichas.filter(f => adesivoParaProducao(f)).length
+    : k === 'adesivos' ? fichas.filter(f => adesivoParaProducao(f, cfg.dias_adesivo)).length
     : k === 'atrasados' ? fichas.filter(estaAtrasado).length : fichas.filter(f => f.etapa === k).length;
 
   el.innerHTML = `
@@ -50,7 +50,7 @@ export async function montarLista(el, aba = 'todos', vivo) {
         if (aba === 'todos' && f.etapa === 'cancelado') return false;
         if (aba === 'atrasados' && !estaAtrasado(f)) return false;
         if (aba === 'pedidos' && !ehPedido(f)) return false;
-        if (aba === 'adesivos' && !adesivoParaProducao(f)) return false;
+        if (aba === 'adesivos' && !adesivoParaProducao(f, cfg.dias_adesivo)) return false;
         if (!['todos', 'atrasados', 'pedidos', 'adesivos'].includes(aba) && f.etapa !== aba) return false;
       }
       if (!t) return true;
@@ -72,7 +72,7 @@ export async function montarLista(el, aba = 'todos', vivo) {
         <span class="meio"><span class="nome">Nº ${esc(f.numero ?? 'novo')} · ${esc(c.nome)}</span>
           <span class="det"><span class="etapa etapa-${f.etapa}">${esc(NOMES_ETAPA[f.etapa])}</span>
           ${orcamentoVencido(f, cfg.validade_dias) ? '<span class="selo alerta">vencido</span>' : ''}
-          ${adesivoParaProducao(f) ? '<span class="selo erro">mandar p/ produção</span>' : ''}
+          ${adesivoParaProducao(f, cfg.dias_adesivo) ? '<span class="selo erro">mandar p/ produção</span>' : ''}
           ${f.prazo ? ` <span style="${atrasado ? 'color:var(--erro);font-weight:700' : ''}">prazo ${data(f.prazo)}</span>` : ''}
           ${f.os_fpq ? ` · OS ${esc(f.os_fpq)}` : ''}</span></span>
         <span class="fim"><span class="valor">${moeda(f.total_centavos)}</span>
@@ -139,7 +139,7 @@ export async function montarDetalhe(el, id, vivo) {
       ${cancelado ? '' : `<div class="trilha" aria-hidden="true">${ETAPAS.map((e, i) => `<span class="${i < idx ? 'feita' : i === idx ? 'atual' : ''}" title="${NOMES_ETAPA[e]}"></span>`).join('')}</div>
       <p class="sub" style="margin-top:6px">${ETAPAS.map((e, i) => i === idx ? `<b style="color:var(--texto)">${NOMES_ETAPA[e]}</b>` : NOMES_ETAPA[e]).join(' › ')}</p>`}
       ${orcamentoVencido(ficha, cfg.validade_dias) ? '<p class="aviso">Orçamento vencido: passou da validade.</p>' : ''}
-      ${adesivoParaProducao(ficha) && !excluido ? `<div class="aviso aviso-adesivo"><b>Adesivo: mandar pra produção.</b> Já fazem ${DIAS_ADESIVO} dias ou mais que virou pedido${ficha.pedido_em ? ` (${data(ficha.pedido_em)})` : ''}. Pode pular a aprovação da arte.
+      ${adesivoParaProducao(ficha, cfg.dias_adesivo) && !excluido ? `<div class="aviso aviso-adesivo"><b>Adesivo: mandar pra produção.</b> Já faz ${cfg.dias_adesivo} ${cfg.dias_adesivo == 1 ? 'dia' : 'dias'} ou mais que virou pedido${ficha.pedido_em ? ` (${data(ficha.pedido_em)})` : ''}. Pode pular a aprovação da arte.
         <button class="btn btn-primario btn-peq" data-etapa="producao" style="margin-top:8px">Mandar pra Produção ▶</button></div>` : ''}
       ${excluido ? '' : `<div class="botoes">
         ${cancelado ? '<button class="btn" data-etapa="orcamento">Reabrir como orçamento</button>' : `

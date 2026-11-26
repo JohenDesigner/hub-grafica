@@ -105,8 +105,8 @@ export function somarDiasUteis(isoData, dias) {
 // Adesivos: vão para a produção 3 dias depois de virar pedido, mesmo sem a aprovação da arte.
 export const DIAS_ADESIVO = 3;
 export const temAdesivo = f => (f.itens || []).some(it => String(it.produto_id || '').startsWith('site:adesivos:') || /adesiv/i.test(it.nome || ''));
-export function adesivoParaProducao(f, agora = Date.now()) {
+export function adesivoParaProducao(f, dias = DIAS_ADESIVO, agora = Date.now()) {
   if (!['sinal', 'arte', 'aprovacao'].includes(f.etapa) || !temAdesivo(f)) return false;
   const desde = Date.parse(f.pedido_em || f.etapa_em || f.criado_em);
-  return !isNaN(desde) && agora - desde >= DIAS_ADESIVO * 864e5;
+  return !isNaN(desde) && agora - desde >= (Number(dias) || DIAS_ADESIVO) * 864e5;
 }
