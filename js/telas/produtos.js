@@ -4,6 +4,8 @@ import { listar, salvar, excluir } from '../db.js';
 import { moeda, lerNumero } from '../formato.js';
 import { emCentavos } from '../calc.js';
 import { esc, avisar, confirmar, abrirModal, fecharModal, titulo, ICONE } from '../ui.js';
+import { carregarCfg } from './configuracoes.js';
+import { SERVICOS_PADRAO } from './balcao.js';
 
 const NOME_TIPO = { opcoes: 'Opções', m2: 'Por m²', unidade: 'Por unidade' };
 // "Quantidade e valor" (tipo cartão de visita): guardado como opções "100 un.", "500 un."…
@@ -20,12 +22,20 @@ export function extraParaProduto(r) {
 }
 
 export async function todosProdutos({ forcar = false, incluirInativos = false } = {}) {
-  const [cat, extras] = await Promise.all([
+  const [cat, extras, cfg] = await Promise.all([
     carregarCatalogo({ forcar }),
-    listar('produtos', { order: 'nome' }).catch(() => [])
+    listar('produtos', { order: 'nome' }).catch(() => []),
+    carregarCfg().catch(() => ({}))
   ]);
   const ext = extras.map(extraParaProduto).filter(p => incluirInativos || p.ativo);
-  return { lista: [...cat.lista, ...ext], quando: cat.quando, offline: cat.offline };
+  return { lista: [...cat.lista, ...ext, ...produtosDoBalcao(cfg.balcao)], quando: cat.quando, offline: cat.offline };
+}
+
+// Botões do Balcão (impressão, xerox…) também entram nos pedidos, cobrados por unidade.
+export function produtosDoBalcao(botoes) {
+  const lista = Array.isArray(botoes) && botoes.length ? botoes : SERVICOS_PADRAO;
+  return lista.filter(s => s?.nome).map(s => ({ id: `balcao:${s.nome}`, origem: 'balcao', categoria: 'balcao', nome: s.nome, tipo: 'unidade',
+    preco: Number(s.preco) || 0, minimo: 0, minimo_por: 'total', m2_livre: 0, opcoes: [], acabamentos: [], prazo_dias: 1, ativo: true }));
 }
 
 export function aPartirDe(p) {
@@ -56,13 +66,13 @@ export async function montar(el, _p, vivo, forcar = false) {
   const desenhar = () => {
     const t = el.querySelector('#p-busca').value.trim().toLowerCase();
     const vis = lista.filter(p => !t || [p.nome, p.codigo, p.detalhes?.referencia, p.detalhes?.codigo_barras, p.detalhes?.grupo].some(x => String(x ?? '').toLowerCase().includes(t)));
-    const grupos = ['extras', ...Object.keys(NOMES_CATEGORIA).filter(k => k !== 'extras')].map(cat => [cat, vis.filter(p => p.categoria === cat)]).filter(([, l]) => l.length);
+    const grupos = ['extras', 'balcao', ...Object.keys(NOMES_CATEGORIA).filter(k => k !== 'extras' && k !== 'balcao')].map(cat => [cat, vis.filter(p => p.categoria === cat)]).filter(([, l]) => l.length);
     el.querySelector('#p-lista').innerHTML = grupos.length ? grupos.map(([cat, l]) => `
       <p class="grupo-titulo">${esc(NOMES_CATEGORIA[cat])} (${l.length})</p>
       <ul class="lista">${l.map(p => `<li><button class="lista-item" data-id="${esc(p.id)}">
         <span class="meio"><span class="nome">${p.codigo ? `<span class="cod">${esc(p.codigo)}</span> ` : ''}${esc(p.nome)}</span><span class="det">${p.detalhes?.servico ? 'Serviço · ' : ''}${p.detalhes?.grupo ? esc(p.detalhes.grupo) + ' · ' : ''}${esc(p.tipo === 'opcoes' && ehQtd(p.opcoes) ? NOME_FORM.qtd : NOME_TIPO[p.tipo])} · prazo ${p.prazo_dias} dias úteis${p.detalhes?.controla_estoque && p.detalhes.estoque_atual != null ? ` · estoque ${esc(String(p.detalhes.estoque_atual).replace('.', ','))} ${esc(p.detalhes.unidade || '')}${p.detalhes.estoque_min != null && p.detalhes.estoque_atual <= p.detalhes.estoque_min ? ' <b style="color:var(--erro)">baixo</b>' : ''}` : ''}</span></span>
         <span class="fim"><span class="valor">${esc(aPartirDe(p))}</span><br>
-          ${p.origem === 'site' ? '<span class="selo">do site</span>' : p.ativo ? '<span class="selo ok">extra</span>' : '<span class="selo alerta">inativo</span>'}</span>
+          ${p.origem === 'site' ? '<span class="selo">do site</span>' : p.origem === 'balcao' ? '<span class="selo">balcão</span>' : p.ativo ? '<span class="selo ok">extra</span>' : '<span class="selo alerta">inativo</span>'}</span>
       </button></li>`).join('')}</ul>`).join('') : '<p class="vazio">Nenhum produto encontrado.</p>';
   };
   desenhar();
@@ -70,7 +80,12 @@ export async function montar(el, _p, vivo, forcar = false) {
   el.querySelector('#p-lista').addEventListener('click', e => {
     const b = e.target.closest('[data-id]'); if (!b) return;
     const p = lista.find(x => x.id === b.dataset.id);
-    if (p.origem === 'site') verProdutoSite(p); else formExtra(p, () => montar(el, _p, vivo));
+    if (p.origem === 'site') verProdutoSite(p);
+    else if (p.origem === 'balcao') abrirModal(`<div class="modal-topo"><h2>${esc(p.nome)}</h2><button class="icone-btn" data-fechar aria-label="Fechar">${ICONE.fechar}</button></div>
+      <div class="resumo"><span>Preço por unidade</span><span class="valor">${esc(moeda(emCentavos(p.preco)))}</span></div>
+      <p class="aviso info">Este produto vem dos botões do Balcão e também pode ser usado nos orçamentos e pedidos. Para mudar nome ou preço, vá em Balcão → Editar botões.</p>
+      <a class="btn btn-bloco" href="#balcao" data-fechar>Abrir o Balcão</a>`);
+    else formExtra(p, () => montar(el, _p, vivo));
   });
   el.querySelector('#p-novo').addEventListener('click', () => formExtra(null, () => montar(el, _p, vivo)));
   el.querySelector('#p-atualizar').addEventListener('click', async e => {
